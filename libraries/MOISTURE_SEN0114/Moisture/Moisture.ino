@@ -10,15 +10,20 @@
   # 300~700     humid soil
   # 700~950     in water
 */
+#include <MOISTURE_SEN0114.h>
+
+MOISTURE_SEN0114 obj;
 
 void setup()
 {
   Serial.begin(9600);
+  obj = MOISTURE_SEN0114(700, 7);
 }
 
 void loop()
 {
-  Serial.print("Moisture Sensor Value:");
-  Serial.println(analogRead(7));  
+  Serial.print("Moisture Sensor Value:");Serial.print(obj.getMoisturePercent());Serial.println("[%]");
+  Serial.print("Moisture Sensor Value:");Serial.print(obj.getMoistureRatio());Serial.println("[ratio]");
+  Serial.print("Moisture Sensor Value:");Serial.print(obj.getMoistureRaw());Serial.println("[raw]");
   delay(1000);
 }
