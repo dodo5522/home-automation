@@ -88,14 +88,14 @@ static HTU21D *myHumidity = NULL;
 
 void setup()
 {
-  Serial.begin(9600);
+    Serial.begin(9600);
 
-  myMoisture = new MOISTURE_SEN0114(700, 7);
-  myHumidity = new HTU21D();
-  myHumidity->begin();
+    myMoisture = new MOISTURE_SEN0114(700, 7);
+    myHumidity = new HTU21D();
+    myHumidity->begin();
 
 #ifdef XBEE_MODE_API
-  myXBee.setSerial(Serial);
+    myXBee.setSerial(Serial);
 #endif
 }
 
@@ -127,10 +127,10 @@ void loop()
         indicateStatsOnLed(myXBee);
     }
 #else
-  Serial.print("Moisture :");Serial.print(moist);Serial.println("[%]");
-  Serial.print("Humidity :");Serial.print(humd);Serial.println("[%]");
-  Serial.print("Temperature :");Serial.print(temp);Serial.println("[C]");
+    Serial.print("Moisture :");Serial.print(moist);Serial.println("[%]");
+    Serial.print("Humidity :");Serial.print(humd);Serial.println("[%]");
+    Serial.print("Temperature :");Serial.print(temp);Serial.println("[C]");
 #endif
 
-  delay(1000);
+    delay(1000);
 }
