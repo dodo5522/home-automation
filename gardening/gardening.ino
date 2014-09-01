@@ -12,20 +12,16 @@
 */
 #define XBEE_MODE_API
 
-#include <stdio.h>
 #include <Wire.h>
 #include <HTU21D.h>
 #include <MOISTURE_SEN0114.h>
 #ifdef XBEE_MODE_API
 #include <XBee.h>
-
-XBee myXBee = XBee();
-XBeeAddress64 addrContributor = XBeeAddress64(0x0013A200, 0x40B4500A);
 #endif
 
-MOISTURE_SEN0114 *myMoisture = NULL;
-HTU21D *myHumidity = NULL;
-
+/****************************
+ * internal functions
+ ****************************/
 int statusLed = 13;
 int errorLed = 13;
 
@@ -42,6 +38,55 @@ void flashLed(int pin, int times, int wait)
     }
 }
 
+void indicateStatsOnLed(XBee &myXBee)
+{
+    // if there is no problem on conmunication, LED is not lighten.
+    ZBTxStatusResponse txStatus = ZBTxStatusResponse();
+
+    // after sending a tx request, we expect a status response
+    // wait up to half second for the status response
+    if (myXBee.readPacket(500))
+    {
+        // should be a znet tx status
+        if (myXBee.getResponse().getApiId() != ZB_TX_STATUS_RESPONSE)
+        {
+            flashLed(errorLed, 4, 500);
+            return;
+        }
+
+        myXBee.getResponse().getZBTxStatusResponse(txStatus);
+
+        // get the delivery status, the fifth byte
+        if (txStatus.getDeliveryStatus() != SUCCESS)
+        {
+            // the remote XBee did not receive our packet. is it powered on?
+            flashLed(errorLed, 4, 500);
+        }
+    }
+    else if (myXBee.getResponse().isError())
+    {
+        //nss.print("Error reading packet.  Error code: ");
+        //nss.println(myXBee.getResponse().getErrorCode());
+        flashLed(errorLed, 3, 500);
+    }
+    else
+    {
+        // local XBee did not provide a timely TX Status Response -- should not happen
+        flashLed(errorLed, 2, 50);
+    }
+}
+
+
+/****************************
+ * main routine
+ ****************************/
+#ifdef XBEE_MODE_API
+static XBee myXBee = XBee();
+static XBeeAddress64 addrContributor = XBeeAddress64(0x0013A200, 0x40B4500A);
+#endif
+static MOISTURE_SEN0114 *myMoisture = NULL;
+static HTU21D *myHumidity = NULL;
+
 void setup()
 {
   Serial.begin(9600);
@@ -55,79 +100,32 @@ void setup()
 #endif
 }
 
-class SensorValToStr
-{
-    public:
-        SensorValToStr(char *title, double value)
-        {
-            snprintf(str, sizeof(str), "%s:%.1f", title, value);
-        };
-        SensorValToStr(char *title, int value)
-        {
-            snprintf(str, sizeof(str), "%s:%d", title, value);
-        };
-        virtual ~SensorValToStr(){};
-        char* getStr(void)
-        {
-            return str;
-        };
-    private:
-        char str[32];
-};
-
 void loop()
 {
-  SensorValToStr mySensorValues[] = {
-      SensorValToStr("Humidity", (double)myHumidity->readHumidity()),
-      SensorValToStr("Temperature", (double)myHumidity->readTemperature()),
-      SensorValToStr("Moisture", (int)myMoisture->getMoisturePercent())
-  };
+    unsigned char nowMoisture = myMoisture->getMoisturePercent();
+    unsigned char nowHumidity = (unsigned char)myHumidity->readHumidity();
+    char nowTemperature = (char)myHumidity->readTemperature();
 
 #ifdef XBEE_MODE_API
-    ZBTxStatusResponse txStatus = ZBTxStatusResponse();
+    unsigned char sensorData[][5] =
+    {
+        /* signed prefix         value */
+        {  0,     'M', 'O', 'I', nowMoisture},
+        {  0,     'H', 'U', 'M', nowHumidity},
+        {  1,     'T', 'M', 'P', (unsigned char)nowTemperature},
+    };
 
-    for(int i = 0; i < sizeof(mySensorValues)/sizeof(SensorValToStr); i++)
+    for(int i = 0; i < sizeof(sensorData)/sizeof(sensorData[0]); i++)
     {
         ZBTxRequest myTxRequest = ZBTxRequest(
                 addrContributor,
-                (uint8_t*)mySensorValues[i].getStr(),
-                strlen(mySensorValues[i].getStr()));
+                (uint8_t*)sensorData[i],
+                sizeof(sensorData[i]));
 
         myXBee.send(myTxRequest);
 
-        // after sending a tx request, we expect a status response
-        // wait up to half second for the status response
-        if (myXBee.readPacket(500))
-        {
-            // should be a znet tx status
-            if (myXBee.getResponse().getApiId() == ZB_TX_STATUS_RESPONSE)
-            {
-                myXBee.getResponse().getZBTxStatusResponse(txStatus);
-
-                // get the delivery status, the fifth byte
-                if (txStatus.getDeliveryStatus() == SUCCESS)
-                {
-                    // success.  time to celebrate
-                    //flashLed(statusLed, 5, 50);
-                }
-                else
-                {
-                    // the remote XBee did not receive our packet. is it powered on?
-                    flashLed(errorLed, 4, 500);
-                }
-            }
-        }
-        else if (myXBee.getResponse().isError())
-        {
-            //nss.print("Error reading packet.  Error code: ");
-            //nss.println(myXBee.getResponse().getErrorCode());
-            flashLed(errorLed, 3, 500);
-        }
-        else
-        {
-            // local XBee did not provide a timely TX Status Response -- should not happen
-            flashLed(errorLed, 2, 50);
-        }
+        // this function takes 500ms as max when timeout error.
+        indicateStatsOnLed(myXBee);
     }
 #else
   Serial.print("Moisture :");Serial.print(moist);Serial.println("[%]");
