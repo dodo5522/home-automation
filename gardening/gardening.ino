@@ -22,16 +22,15 @@
 /****************************
  * internal functions
  ****************************/
-int statusLed = 13;
-int errorLed = 13;
-
-void flashLed(int pin, int times, int wait)
+void flashLed(int times, int wait)
 {
+    static const int errorLed = 13;
+
     for (int i = 0; i < times; i++)
     {
-        digitalWrite(pin, HIGH);
+        digitalWrite(errorLed, HIGH);
         delay(wait);
-        digitalWrite(pin, LOW);
+        digitalWrite(errorLed, LOW);
 
         if (i + 1 < times)
             delay(wait);
@@ -50,7 +49,7 @@ void indicateStatsOnLed(XBee &myXBee)
         // should be a znet tx status
         if (myXBee.getResponse().getApiId() != ZB_TX_STATUS_RESPONSE)
         {
-            flashLed(errorLed, 4, 500);
+            flashLed(4, 500);
             return;
         }
 
@@ -60,19 +59,19 @@ void indicateStatsOnLed(XBee &myXBee)
         if (txStatus.getDeliveryStatus() != SUCCESS)
         {
             // the remote XBee did not receive our packet. is it powered on?
-            flashLed(errorLed, 4, 500);
+            flashLed(4, 500);
         }
     }
     else if (myXBee.getResponse().isError())
     {
         //nss.print("Error reading packet.  Error code: ");
         //nss.println(myXBee.getResponse().getErrorCode());
-        flashLed(errorLed, 3, 500);
+        flashLed(3, 500);
     }
     else
     {
         // local XBee did not provide a timely TX Status Response -- should not happen
-        flashLed(errorLed, 2, 50);
+        flashLed(2, 50);
     }
 }
 
