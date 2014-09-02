@@ -99,27 +99,61 @@ void setup()
 #endif
 }
 
+typedef struct _SENSOR_DATA
+{
+    unsigned char type[3];  // MOI means moisture
+    unsigned char sign;     // 0:plus, 1:minus
+    unsigned char value[4]; // value got from sensor *10 to indicate decimal part.
+}SENSOR_DATA;
+
 void loop()
 {
-    unsigned char nowMoisture = myMoisture->getMoisturePercent();
-    unsigned char nowHumidity = (unsigned char)myHumidity->readHumidity();
-    char nowTemperature = (char)myHumidity->readTemperature();
+    long nowTemp  = (long)(10 * myHumidity->readTemperature());
+    unsigned long nowTempNoSign = (unsigned long)abs(nowTemp);
+    unsigned long nowMoist = (unsigned long)(10 * myMoisture->getMoisturePercent());
+    unsigned long nowHumid = (unsigned long)(10 * myHumidity->readHumidity());
 
 #ifdef XBEE_MODE_API
-    unsigned char sensorData[][5] =
+    SENSOR_DATA sensorData[] =
     {
-        /* signed prefix         value */
-        {  0,     'M', 'O', 'I', nowMoisture},
-        {  0,     'H', 'U', 'M', nowHumidity},
-        {  1,     'T', 'M', 'P', (unsigned char)nowTemperature},
+        {
+            {'M', 'O', 'I'},
+            0,
+            {
+                (nowMoist & 0x000000ff),
+                (nowMoist & 0x0000ff00) >> 8,
+                (nowMoist & 0x00ff0000) >> 16,
+                (nowMoist & 0xff000000) >> 24
+            }
+        },
+        {
+            {'H', 'U', 'M'},
+            0,
+            {
+                (nowHumid & 0x000000ff),
+                (nowHumid & 0x0000ff00) >> 8,
+                (nowHumid & 0x00ff0000) >> 16,
+                (nowHumid & 0xff000000) >> 24
+            }
+        },
+        {
+            {'T', 'M', 'P'},
+            nowTemp < 0 ? 1 : 0,
+            {
+                (nowTempNoSign & 0x000000ff),
+                (nowTempNoSign & 0x0000ff00) >> 8,
+                (nowTempNoSign & 0x00ff0000) >> 16,
+                (nowTempNoSign & 0xff000000) >> 24
+            }
+        }
     };
 
-    for(int i = 0; i < sizeof(sensorData)/sizeof(sensorData[0]); i++)
+    for(int i = 0; i < sizeof(sensorData)/sizeof(SENSOR_DATA); i++)
     {
         ZBTxRequest myTxRequest = ZBTxRequest(
                 addrContributor,
-                (uint8_t*)sensorData[i],
-                sizeof(sensorData[i]));
+                (uint8_t*)&sensorData[i],
+                sizeof(SENSOR_DATA));
 
         myXBee.send(myTxRequest);
 
