@@ -13,6 +13,7 @@
 #define XBEE_MODE_API
 
 #include <Wire.h>
+#include <TSL2561.h>
 #include <HTU21D.h>
 #include <MOISTURE_SEN0114.h>
 #ifdef XBEE_MODE_API
@@ -75,7 +76,6 @@ void indicateStatsOnLed(XBee &myXBee)
     }
 }
 
-
 /****************************
  * main routine
  ****************************/
@@ -85,6 +85,21 @@ static XBeeAddress64 addrContributor = XBeeAddress64(0x0013A200, 0x40B4500A);
 #endif
 static MOISTURE_SEN0114 *myMoisture = NULL;
 static HTU21D *myHumidity = NULL;
+static TSL2561 *myLight = NULL;
+
+// If gain = false (0), device is set to low gain (1X)
+// If gain = high (1), device is set to high gain (16X)
+static boolean lightGain = false;
+// If time = 0, integration will be 13.7ms
+// If time = 1, integration will be 101ms
+// If time = 2, integration will be 402ms
+// If time = 3, use manual start / stop to perform your own integration
+static unsigned char lightIntegrationTimeIndex = 2;
+// Integration ("shutter") time in milliseconds
+static unsigned int lightIntegrationTime = 0;
+
+// If the interval is lower than integration time, setup() set the integration time as minimum.
+static unsigned int mainLoopInterval = 1000;
 
 void setup()
 {
@@ -93,6 +108,20 @@ void setup()
     myMoisture = new MOISTURE_SEN0114(700, 7);
     myHumidity = new HTU21D();
     myHumidity->begin();
+    myLight = new TSL2561();
+    myLight->begin();
+
+    // setTiming() will set the third parameter (ms) to the
+    // requested integration time in ms (this will be useful later):
+    myLight->setTiming(lightGain, lightIntegrationTimeIndex, lightIntegrationTime);
+    // To start taking measurements, power up the sensor:
+    myLight->setPowerUp();
+    // The sensor will now gather light during the integration time.
+    // After the specified time, you can retrieve the result from the sensor.
+    // Once a measurement occurs, another integration period will start.
+
+    if(mainLoopInterval < lightIntegrationTime)
+        mainLoopInterval = lightIntegrationTime;
 
 #ifdef XBEE_MODE_API
     myXBee.setSerial(Serial);
@@ -113,9 +142,33 @@ void loop()
     unsigned long nowMoist = (unsigned long)(10 * myMoisture->getMoisturePercent());
     unsigned long nowHumid = (unsigned long)(10 * myHumidity->readHumidity());
 
+    unsigned int lightData0, lightData1;
+    double nowLuxDouble = 0.0;
+    unsigned long nowLux = 0;
+    boolean boolSuccess = false;
+
+    delay(mainLoopInterval);
+
+    if (myLight->getData(lightData0, lightData1))
+    {
+        // Perform lux calculation:
+        boolSuccess = myLight->getLux(lightGain, lightIntegrationTime, lightData0, lightData1, nowLuxDouble);
+        nowLux = (unsigned long)(10 * nowLuxDouble);
+    }
+
 #ifdef XBEE_MODE_API
     SENSOR_DATA sensorData[] =
     {
+        {
+            {'L', 'U', 'X'},
+            0,
+            {
+                (nowLux & 0x000000ff),
+                (nowLux & 0x0000ff00) >> 8,
+                (nowLux & 0x00ff0000) >> 16,
+                (nowLux & 0xff000000) >> 24
+            }
+        },
         {
             {'M', 'O', 'I'},
             0,
@@ -165,6 +218,4 @@ void loop()
     Serial.print("Humidity :");Serial.print(humd);Serial.println("[%]");
     Serial.print("Temperature :");Serial.print(temp);Serial.println("[C]");
 #endif
-
-    delay(1000);
 }
