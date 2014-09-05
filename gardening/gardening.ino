@@ -201,7 +201,7 @@ void loop()
         }
     };
 
-    for(int i = 0; i < sizeof(sensorData)/sizeof(SENSOR_DATA); i++)
+    for(unsigned int i = 0; i < sizeof(sensorData)/sizeof(SENSOR_DATA); i++)
     {
         ZBTxRequest myTxRequest = ZBTxRequest(
                 addrContributor,
