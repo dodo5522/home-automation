@@ -137,24 +137,28 @@ typedef struct _SENSOR_DATA
 
 void loop()
 {
-    long nowTemp  = (long)(10 * myHumidity->readTemperature());
-    unsigned long nowTempNoSign = (unsigned long)abs(nowTemp);
-    unsigned long nowMoist = (unsigned long)(10 * myMoisture->getMoisturePercent());
-    unsigned long nowHumid = (unsigned long)(10 * myHumidity->readHumidity());
-
-    unsigned int lightData0, lightData1;
+    long nowTemp = 0;
+    unsigned long nowTempNoSign = 0;
+    unsigned long nowMoist = 0;
+    unsigned long nowHumid = 0;
+    unsigned int lightData0 = 0;
+    unsigned int lightData1 = 0;
     double nowLuxDouble = 0.0;
     unsigned long nowLux = 0;
-    boolean boolSuccess = false;
 
     delay(mainLoopInterval);
 
     if (myLight->getData(lightData0, lightData1))
     {
         // Perform lux calculation:
-        boolSuccess = myLight->getLux(lightGain, lightIntegrationTime, lightData0, lightData1, nowLuxDouble);
+        myLight->getLux(lightGain, lightIntegrationTime, lightData0, lightData1, nowLuxDouble);
         nowLux = (unsigned long)(10 * nowLuxDouble);
     }
+
+    nowTemp  = (long)(10 * myHumidity->readTemperature());
+    nowTempNoSign = (unsigned long)abs(nowTemp);
+    nowMoist = (unsigned long)(10 * myMoisture->getMoisturePercent());
+    nowHumid = (unsigned long)(10 * myHumidity->readHumidity());
 
 #ifdef XBEE_MODE_API
     SENSOR_DATA sensorData[] =
