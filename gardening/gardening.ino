@@ -58,22 +58,12 @@ void indicateStatsOnLed(XBee &myXBee)
 
         // get the delivery status, the fifth byte
         if (txStatus.getDeliveryStatus() != SUCCESS)
-        {
-            // the remote XBee did not receive our packet. is it powered on?
             flashLed(4, 500);
-        }
     }
     else if (myXBee.getResponse().isError())
-    {
-        //nss.print("Error reading packet.  Error code: ");
-        //nss.println(myXBee.getResponse().getErrorCode());
         flashLed(3, 500);
-    }
     else
-    {
-        // local XBee did not provide a timely TX Status Response -- should not happen
         flashLed(2, 50);
-    }
 }
 
 /****************************
