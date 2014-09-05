@@ -143,7 +143,8 @@ void loop()
     unsigned long nowHumid = (unsigned long)(10 * myHumidity->readHumidity());
 
     unsigned int lightData0, lightData1;
-    double lux;    // Resulting lux value
+    double nowLuxDouble = 0.0;
+    unsigned long nowLux = 0;
     boolean boolSuccess = false;
 
     delay(mainLoopInterval);
@@ -151,12 +152,23 @@ void loop()
     if (myLight->getData(lightData0, lightData1))
     {
         // Perform lux calculation:
-        boolSuccess = myLight->getLux(lightGain, lightIntegrationTime, lightData0, lightData1, lux);
+        boolSuccess = myLight->getLux(lightGain, lightIntegrationTime, lightData0, lightData1, nowLuxDouble);
+        nowLux = (unsigned long)(10 * nowLuxDouble);
     }
 
 #ifdef XBEE_MODE_API
     SENSOR_DATA sensorData[] =
     {
+        {
+            {'L', 'U', 'X'},
+            0,
+            {
+                (nowLux & 0x000000ff),
+                (nowLux & 0x0000ff00) >> 8,
+                (nowLux & 0x00ff0000) >> 16,
+                (nowLux & 0xff000000) >> 24
+            }
+        },
         {
             {'M', 'O', 'I'},
             0,
