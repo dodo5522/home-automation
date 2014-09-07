@@ -1,3 +1,9 @@
 [submodule "libraries/XBee"]
 	path = libraries/XBee
 	url = https://code.google.com/p/xbee-arduino
+[submodule "schematic/DFRobot"]
+	path = schematic/DFRobot
+	url = https://github.com/DFRobot/Fritzing-library.git
+[submodule "schematic/adafruit"]
+	path = schematic/adafruit
+	url = https://github.com/adafruit/Fritzing-Library.git
