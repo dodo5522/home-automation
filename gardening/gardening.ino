@@ -50,7 +50,7 @@ void indicateStatsOnLed(XBee &myXBee)
         // should be a znet tx status
         if (myXBee.getResponse().getApiId() != ZB_TX_STATUS_RESPONSE)
         {
-            flashLed(4, 500);
+            flashLed(5, 500);
             return;
         }
 
