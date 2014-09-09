@@ -208,8 +208,9 @@ void loop()
         indicateStatsOnLed(myXBee);
     }
 #else
-    Serial.print("Moisture :");Serial.print(moist);Serial.println("[%]");
-    Serial.print("Humidity :");Serial.print(humd);Serial.println("[%]");
-    Serial.print("Temperature :");Serial.print(temp);Serial.println("[C]");
+    Serial.print("Luminosity:");Serial.print(nowLux/10);Serial.println("[lm]");
+    Serial.print("Moisture :");Serial.print(nowMoist/10);Serial.println("[%]");
+    Serial.print("Humidity :");Serial.print(nowHumid/10);Serial.println("[%]");
+    Serial.print("Temperature :");Serial.print(nowTemp/10);Serial.println("[C]");
 #endif
 }
