@@ -23,6 +23,7 @@
 /****************************
  * internal functions
  ****************************/
+#ifdef XBEE_MODE_API
 void flashLed(int times, int wait)
 {
     static const int errorLed = 13;
@@ -65,6 +66,7 @@ void indicateStatsOnLed(XBee &myXBee)
     else
         flashLed(2, 50);
 }
+#endif
 
 /****************************
  * main routine
