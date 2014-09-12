@@ -98,12 +98,10 @@ void setup()
 
     // setTiming() will set the third parameter (ms) to the
     // requested integration time in ms (this will be useful later):
-    myLight->setTiming(lightGain, lightIntegrationTimeIndex, lightIntegrationTime);
-    // To start taking measurements, power up the sensor:
-    myLight->setPowerUp();
     // The sensor will now gather light during the integration time.
     // After the specified time, you can retrieve the result from the sensor.
-    // Once a measurement occurs, another integration period will start.
+    myLight->setTiming(lightGain, lightIntegrationTimeIndex, lightIntegrationTime);
+    myLight->setPowerUp();
 
     if(mainLoopInterval < lightIntegrationTime)
         mainLoopInterval = lightIntegrationTime;
