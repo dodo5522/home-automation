@@ -10,20 +10,15 @@
  -SCL = A5 (use inline 10k resistor if your board is 5V)
  -Moisture line = A7
 */
-#define XBEE_MODE_API
-
 #include <Wire.h>
 #include <TSL2561.h>
 #include <HTU21D.h>
 #include <MOISTURE_SEN0114.h>
-#ifdef XBEE_MODE_API
 #include <XBee.h>
-#endif
 
 /****************************
  * internal functions
  ****************************/
-#ifdef XBEE_MODE_API
 void flashLed(int times, int wait)
 {
     static const int errorLed = 13;
@@ -66,15 +61,13 @@ void indicateStatsOnLed(XBee &myXBee)
     else
         flashLed(2, 50);
 }
-#endif
 
 /****************************
  * main routine
  ****************************/
-#ifdef XBEE_MODE_API
 static XBee myXBee = XBee();
 static XBeeAddress64 addrContributor = XBeeAddress64(0x0013A200, 0x40B4500A);
-#endif
+
 static MOISTURE_SEN0114 *myMoisture = NULL;
 static HTU21D *myHumidity = NULL;
 static TSL2561 *myLight = NULL;
@@ -115,9 +108,7 @@ void setup()
     if(mainLoopInterval < lightIntegrationTime)
         mainLoopInterval = lightIntegrationTime;
 
-#ifdef XBEE_MODE_API
     myXBee.setSerial(Serial);
-#endif
 }
 
 typedef struct _SENSOR_DATA
@@ -152,7 +143,6 @@ void loop()
     nowMoist = (unsigned long)(10 * myMoisture->getMoisturePercent());
     nowHumid = (unsigned long)(10 * myHumidity->readHumidity());
 
-#ifdef XBEE_MODE_API
     SENSOR_DATA sensorData[] =
     {
         {
