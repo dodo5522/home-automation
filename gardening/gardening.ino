@@ -16,6 +16,14 @@
 #include <MOISTURE_SEN0114.h>
 #include <XBee.h>
 
+#define _DEBUG_GARDENING_
+
+#ifdef _DEBUG_GARDENING_
+#include <SoftwareSerial.h>
+#define DEBUG_PRINT(x) debug_serial->print(x)
+#else
+#define DEBUG_PRINT(x)
+#endif
 /****************************
  * internal functions
  ****************************/
@@ -65,6 +73,12 @@ void indicateStatsOnLed(XBee &myXBee)
 /****************************
  * main routine
  ****************************/
+#ifdef _DEBUG_GARDENING_
+static unsigned int debug_serial_rx_pin = 8;
+static unsigned int debug_serial_tx_pin = 9;
+static SoftwareSerial *debug_serial= NULL;
+#endif
+
 static XBee myXBee = XBee();
 static XBeeAddress64 addrContributor = XBeeAddress64(0x0013A200, 0x40B4500A);
 
@@ -88,7 +102,13 @@ static unsigned int mainLoopInterval = 1000;
 
 void setup()
 {
+#ifdef _DEBUG_GARDENING_
+    debug_serial = new SoftwareSerial(debug_serial_rx_pin, debug_serial_tx_pin);
+    debug_serial->begin(9600);
+#endif
+
     Serial.begin(9600);
+    myXBee.setSerial(Serial);
 
     myMoisture = new MOISTURE_SEN0114(700, 7);
     myHumidity = new HTU21D();
@@ -105,8 +125,6 @@ void setup()
 
     if(mainLoopInterval < lightIntegrationTime)
         mainLoopInterval = lightIntegrationTime;
-
-    myXBee.setSerial(Serial);
 }
 
 typedef struct _SENSOR_DATA
@@ -197,10 +215,9 @@ void loop()
         // this function takes 500ms as max when timeout error.
         indicateStatsOnLed(myXBee);
     }
-#else
-    Serial.print("Luminosity:");Serial.print(nowLux/10);Serial.println("[lm]");
-    Serial.print("Moisture :");Serial.print(nowMoist/10);Serial.println("[%]");
-    Serial.print("Humidity :");Serial.print(nowHumid/10);Serial.println("[%]");
-    Serial.print("Temperature :");Serial.print(nowTemp/10);Serial.println("[C]");
-#endif
+
+    DEBUG_PRINT("Luminosity:");  DEBUG_PRINT(nowLux/10);  DEBUG_PRINT("[lm]");
+    DEBUG_PRINT("Moisture :");   DEBUG_PRINT(nowMoist/10);DEBUG_PRINT("[%]");
+    DEBUG_PRINT("Humidity :");   DEBUG_PRINT(nowHumid/10);DEBUG_PRINT("[%]");
+    DEBUG_PRINT("Temperature :");DEBUG_PRINT(nowTemp/10); DEBUG_PRINT("[C]");
 }
