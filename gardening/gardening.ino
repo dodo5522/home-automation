@@ -16,13 +16,13 @@
 #include <MOISTURE_SEN0114.h>
 #include <XBee.h>
 
-#define _DEBUG_GARDENING_
+//#define _DEBUG_GARDENING_
 
 #ifdef _DEBUG_GARDENING_
 #include <SoftwareSerial.h>
-#define DEBUG_PRINT(x) debug_serial->print(x)
+#define DEBUG_PRINT(...) debug_serial->print(__VA_ARGS__)
 #else
-#define DEBUG_PRINT(x)
+#define DEBUG_PRINT(...)
 #endif
 /****************************
  * internal functions
@@ -216,8 +216,8 @@ void loop()
         indicateStatsOnLed(myXBee);
     }
 
-    DEBUG_PRINT("Luminosity:");  DEBUG_PRINT(nowLux/10);  DEBUG_PRINT("[lm]");
-    DEBUG_PRINT("Moisture :");   DEBUG_PRINT(nowMoist/10);DEBUG_PRINT("[%]");
-    DEBUG_PRINT("Humidity :");   DEBUG_PRINT(nowHumid/10);DEBUG_PRINT("[%]");
-    DEBUG_PRINT("Temperature :");DEBUG_PRINT(nowTemp/10); DEBUG_PRINT("[C]");
+    DEBUG_PRINT("Luminosity:");  DEBUG_PRINT(nowLux/10);  DEBUG_PRINT("[lm]\n");
+    DEBUG_PRINT("Moisture :");   DEBUG_PRINT(nowMoist/10);DEBUG_PRINT("[%]\n");
+    DEBUG_PRINT("Humidity :");   DEBUG_PRINT(nowHumid/10);DEBUG_PRINT("[%]\n");
+    DEBUG_PRINT("Temperature :");DEBUG_PRINT(nowTemp/10); DEBUG_PRINT("[C]\n");
 }
