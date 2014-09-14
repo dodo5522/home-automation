@@ -98,7 +98,7 @@ static unsigned char lightIntegrationTimeIndex = 2;
 static unsigned int lightIntegrationTime = 0;
 
 // If the interval is lower than integration time, setup() set the integration time as minimum.
-static unsigned int mainLoopInterval = 1000;
+static unsigned int mainLoopInterval = 6000;
 
 void setup()
 {
