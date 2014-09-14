@@ -7,3 +7,6 @@
 [submodule "schematic/adafruit"]
 	path = schematic/adafruit
 	url = https://github.com/adafruit/Fritzing-Library.git
+[submodule "schematic/dfrobot"]
+	path = schematic/dfrobot
+	url = https://github.com/DFRobot/Fritzing-library
