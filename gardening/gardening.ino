@@ -137,7 +137,7 @@ typedef struct _SENSOR_DATA
 void loop()
 {
     long nowTemp = 0;
-    unsigned long nowTempNoSign = 0;
+    unsigned long nowTempAbs = 0;
     unsigned long nowMoist = 0;
     unsigned long nowHumid = 0;
     unsigned int lightData0 = 0;
@@ -155,52 +155,16 @@ void loop()
     }
 
     nowTemp  = (long)(10 * myHumidity->readTemperature());
-    nowTempNoSign = (unsigned long)abs(nowTemp);
+    nowTempAbs = (unsigned long)abs(nowTemp);
     nowMoist = (unsigned long)(10 * myMoisture->getMoisturePercent());
     nowHumid = (unsigned long)(10 * myHumidity->readHumidity());
 
     SENSOR_DATA sensorData[] =
     {
-        {
-            {'L', 'U', 'X'},
-            1,
-            {
-                (nowLux & 0x000000ff),
-                (nowLux & 0x0000ff00) >> 8,
-                (nowLux & 0x00ff0000) >> 16,
-                (nowLux & 0xff000000) >> 24
-            }
-        },
-        {
-            {'M', 'O', 'I'},
-            1,
-            {
-                (nowMoist & 0x000000ff),
-                (nowMoist & 0x0000ff00) >> 8,
-                (nowMoist & 0x00ff0000) >> 16,
-                (nowMoist & 0xff000000) >> 24
-            }
-        },
-        {
-            {'H', 'U', 'M'},
-            1,
-            {
-                (nowHumid & 0x000000ff),
-                (nowHumid & 0x0000ff00) >> 8,
-                (nowHumid & 0x00ff0000) >> 16,
-                (nowHumid & 0xff000000) >> 24
-            }
-        },
-        {
-            {'T', 'M', 'P'},
-            nowTemp < 0 ? -1 : 1,
-            {
-                (nowTempNoSign & 0x000000ff),
-                (nowTempNoSign & 0x0000ff00) >> 8,
-                (nowTempNoSign & 0x00ff0000) >> 16,
-                (nowTempNoSign & 0xff000000) >> 24
-            }
-        }
+        {{'L','U','X'},1,             {(nowLux    &0x000000ff),(nowLux    &0x0000ff00)>>8,(nowLux    &0x00ff0000)>>16,(nowLux    &0xff000000)>>24}},
+        {{'M','O','I'},1,             {(nowMoist  &0x000000ff),(nowMoist  &0x0000ff00)>>8,(nowMoist  &0x00ff0000)>>16,(nowMoist  &0xff000000)>>24}},
+        {{'H','U','M'},1,             {(nowHumid  &0x000000ff),(nowHumid  &0x0000ff00)>>8,(nowHumid  &0x00ff0000)>>16,(nowHumid  &0xff000000)>>24}},
+        {{'T','M','P'},nowTemp<0?-1:1,{(nowTempAbs&0x000000ff),(nowTempAbs&0x0000ff00)>>8,(nowTempAbs&0x00ff0000)>>16,(nowTempAbs&0xff000000)>>24}},
     };
 
     for(unsigned int i = 0; i < sizeof(sensorData)/sizeof(SENSOR_DATA); i++)
