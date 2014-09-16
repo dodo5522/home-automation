@@ -21,7 +21,7 @@
  ****************************/
 #ifdef DEBUG_GARDENING
 #include <SoftwareSerial.h>
-#define DEBUG_PRINT(...) debug_serial->print(__VA_ARGS__)
+#define DEBUG_PRINT(...) debug_serial.print(__VA_ARGS__)
 #else
 #define DEBUG_PRINT(...)
 #endif
@@ -30,15 +30,15 @@
  * Global variables
  ****************************/
 #ifdef DEBUG_GARDENING
-static SoftwareSerial *debug_serial= NULL;
+static SoftwareSerial debug_serial = SoftwareSerial(DEBUG_SERIAL_RX_PIN, DEBUG_SERIAL_TX_PIN);
 #endif
 
 static XBee myXBee = XBee();
 static XBeeAddress64 addrContributor = XBeeAddress64(XBEE_ADDRESS_H_COORDINATOR, XBEE_ADDRESS_L_COORDINATOR);
 
-static MOISTURE_SEN0114 *myMoisture = NULL;
-static HTU21D *myHumidity = NULL;
-static TSL2561 *myLight = NULL;
+static MOISTURE_SEN0114 myMoisture = MOISTURE_SEN0114(MOIST1_MAX, MOIST1_READ_PIN);
+static HTU21D myHumidity = HTU21D();
+static TSL2561 myLight = TSL2561();
 
 static unsigned int lightIntegrationTime = 0;
 static unsigned int mainLoopInterval = MAIN_INTERVAL_MSEC;
@@ -95,25 +95,21 @@ void indicateStatsOnLed(XBee &myXBee)
 void setup()
 {
 #ifdef DEBUG_GARDENING
-    debug_serial = new SoftwareSerial(DEBUG_SERIAL_RX_PIN, DEBUG_SERIAL_TX_PIN);
-    debug_serial->begin(DEBUG_SERIAL_BAURATE);
+    debug_serial.begin(DEBUG_SERIAL_BAURATE);
 #endif
 
     Serial.begin(XBEE_SERIAL_BAURATE);
     myXBee.setSerial(Serial);
 
-    myMoisture = new MOISTURE_SEN0114(MOIST1_MAX, MOIST1_READ_PIN);
-    myHumidity = new HTU21D();
-    myHumidity->begin();
-    myLight = new TSL2561();
-    myLight->begin();
+    myHumidity.begin();
+    myLight.begin();
 
     // setTiming() will set the third parameter (ms) to the
     // requested integration time in ms (this will be useful later):
     // The sensor will now gather light during the integration time.
     // After the specified time, you can retrieve the result from the sensor.
-    myLight->setTiming(LIGHT_GAIN, LIGHT_INTEGRATION_TIME_INDEX , lightIntegrationTime);
-    myLight->setPowerUp();
+    myLight.setTiming(LIGHT_GAIN, LIGHT_INTEGRATION_TIME_INDEX , lightIntegrationTime);
+    myLight.setPowerUp();
 
     if(mainLoopInterval < lightIntegrationTime)
         mainLoopInterval = lightIntegrationTime;
@@ -131,16 +127,16 @@ void loop()
 
     delay(mainLoopInterval);
 
-    if (myLight->getData(lightData0, lightData1))
+    if (myLight.getData(lightData0, lightData1))
     {
         // Perform lux calculation:
-        myLight->getLux(LIGHT_GAIN, lightIntegrationTime, lightData0, lightData1, nowLuxDouble);
+        myLight.getLux(LIGHT_GAIN, lightIntegrationTime, lightData0, lightData1, nowLuxDouble);
         nowLux = (long)(10 * nowLuxDouble);
     }
 
-    nowTemp  = (long)(10 * myHumidity->readTemperature());
-    nowMoist = (long)(10 * myMoisture->getMoisturePercent());
-    nowHumid = (long)(10 * myHumidity->readHumidity());
+    nowTemp  = (long)(10 * myHumidity.readTemperature());
+    nowHumid = (long)(10 * myHumidity.readHumidity());
+    nowMoist = (long)(10 * myMoisture.getMoisturePercent());
 
     SENSOR_DATA sensorData[] =
     {
