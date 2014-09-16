@@ -46,6 +46,25 @@ static unsigned int mainLoopInterval = MAIN_INTERVAL_MSEC;
 /****************************
  * internal functions
  ****************************/
+boolean isTriggerToPost(void)
+{
+    static unsigned long previous_tick_count = millis();
+    unsigned long current_tick_count = millis();
+
+    if(current_tick_count < previous_tick_count)
+    {
+        previous_tick_count = current_tick_count;
+        return false;
+    }
+    else if(current_tick_count - previous_tick_count < mainLoopInterval)
+    {
+        return false;
+    }
+
+    previous_tick_count = current_tick_count;
+    return true;
+}
+
 void flashLed(int times, int wait)
 {
     static const int errorLed = 13;
@@ -125,7 +144,8 @@ void loop()
     double nowLuxDouble = 0.0;
     long nowLux = 0;
 
-    delay(mainLoopInterval);
+    if (isTriggerToPost() != true)
+        return;
 
     if (myLight.getData(lightData0, lightData1))
     {
