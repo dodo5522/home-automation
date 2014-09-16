@@ -136,13 +136,17 @@ void setup()
 
 void loop()
 {
-    long nowTemp = 0;
-    long nowMoist = 0;
-    long nowHumid = 0;
     unsigned int lightData0 = 0;
     unsigned int lightData1 = 0;
     double nowLuxDouble = 0.0;
-    long nowLux = 0;
+    unsigned char sendData[sizeof(SENSOR_DATA) * E_SENSOR_MAX] = {0,};
+    SENSOR_DATA sensorData[E_SENSOR_MAX] =
+    {
+        {{'L', 'U', 'X', '\0'}, 0},
+        {{'M', 'O', 'I', '\0'}, 0},
+        {{'H', 'U', 'M', '\0'}, 0},
+        {{'T', 'M', 'P', '\0'}, 0},
+    };
 
     if (isTriggerToPost() != true)
         return;
@@ -151,36 +155,27 @@ void loop()
     {
         // Perform lux calculation:
         myLight.getLux(LIGHT_GAIN, lightIntegrationTime, lightData0, lightData1, nowLuxDouble);
-        nowLux = (long)(10 * nowLuxDouble);
+        sensorData[E_SENSOR_LUMINOSITY].value = (long)(10 * nowLuxDouble);
     }
 
-    nowTemp  = (long)(10 * myHumidity.readTemperature());
-    nowHumid = (long)(10 * myHumidity.readHumidity());
-    nowMoist = (long)(10 * myMoisture.getMoisturePercent());
+    sensorData[E_SENSOR_TEMPERATURE].value = (long)(10 * myHumidity.readTemperature());
+    sensorData[E_SENSOR_HUMIDITY].value    = (long)(10 * myHumidity.readHumidity());
+    sensorData[E_SENSOR_MOISTURE].value    = (long)(10 * myMoisture.getMoisturePercent());
 
-    SENSOR_DATA sensorData[] =
-    {
-        {{'L', 'U', 'X', '\0'}, nowLux  },
-        {{'M', 'O', 'I', '\0'}, nowMoist},
-        {{'H', 'U', 'M', '\0'}, nowHumid},
-        {{'T', 'M', 'P', '\0'}, nowTemp },
-    };
+    memcpy(sendData, sensorData, sizeof(sendData));
 
-    for(unsigned int i = 0; i < sizeof(sensorData)/sizeof(SENSOR_DATA); i++)
-    {
-        ZBTxRequest myTxRequest = ZBTxRequest(
-                addrContributor,
-                (uint8_t*)&sensorData[i],
-                sizeof(SENSOR_DATA));
+    ZBTxRequest myTxRequest = ZBTxRequest(
+            addrContributor,
+            (uint8_t*)sendData,
+            sizeof(sendData));
 
-        myXBee.send(myTxRequest);
+    myXBee.send(myTxRequest);
 
-        // this function takes 500ms as max when timeout error.
-        indicateStatsOnLed(myXBee);
-    }
+    // this function takes 500ms as max when timeout error.
+    indicateStatsOnLed(myXBee);
 
-    DEBUG_PRINT("Luminosity:");  DEBUG_PRINT(nowLux/10);  DEBUG_PRINT("[lm]\n");
-    DEBUG_PRINT("Moisture :");   DEBUG_PRINT(nowMoist/10);DEBUG_PRINT("[%]\n");
-    DEBUG_PRINT("Humidity :");   DEBUG_PRINT(nowHumid/10);DEBUG_PRINT("[%]\n");
-    DEBUG_PRINT("Temperature :");DEBUG_PRINT(nowTemp/10); DEBUG_PRINT("[C]\n");
+    DEBUG_PRINT("Luminosity:");  DEBUG_PRINT(sensorData[E_SENSOR_LUMINOSITY].value/10.0); DEBUG_PRINT("[lm]\n");
+    DEBUG_PRINT("Moisture :");   DEBUG_PRINT(sensorData[E_SENSOR_MOISTURE].value/10.0);   DEBUG_PRINT("[%]\n");
+    DEBUG_PRINT("Humidity :");   DEBUG_PRINT(sensorData[E_SENSOR_HUMIDITY].value/10.0);   DEBUG_PRINT("[%]\n");
+    DEBUG_PRINT("Temperature :");DEBUG_PRINT(sensorData[E_SENSOR_TEMPERATURE].value/10.0);DEBUG_PRINT("[C]\n");
 }
