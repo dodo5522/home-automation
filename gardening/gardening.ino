@@ -129,21 +129,19 @@ void setup()
 
 typedef struct _SENSOR_DATA
 {
-    unsigned char type[3];  // ex. MOI means moisture
-    char sign;              // -1 or 1
-    unsigned char value[4]; // value got from sensor *10 to indicate decimal part.
+    unsigned char type[4]; // ex. MOI means moisture
+    long value;            // value got from sensor *10 to indicate decimal part.
 }SENSOR_DATA;
 
 void loop()
 {
     long nowTemp = 0;
-    unsigned long nowTempAbs = 0;
-    unsigned long nowMoist = 0;
-    unsigned long nowHumid = 0;
+    long nowMoist = 0;
+    long nowHumid = 0;
     unsigned int lightData0 = 0;
     unsigned int lightData1 = 0;
     double nowLuxDouble = 0.0;
-    unsigned long nowLux = 0;
+    long nowLux = 0;
 
     delay(mainLoopInterval);
 
@@ -151,20 +149,19 @@ void loop()
     {
         // Perform lux calculation:
         myLight->getLux(lightGain, lightIntegrationTime, lightData0, lightData1, nowLuxDouble);
-        nowLux = (unsigned long)(10 * nowLuxDouble);
+        nowLux = (long)(10 * nowLuxDouble);
     }
 
     nowTemp  = (long)(10 * myHumidity->readTemperature());
-    nowTempAbs = (unsigned long)abs(nowTemp);
-    nowMoist = (unsigned long)(10 * myMoisture->getMoisturePercent());
-    nowHumid = (unsigned long)(10 * myHumidity->readHumidity());
+    nowMoist = (long)(10 * myMoisture->getMoisturePercent());
+    nowHumid = (long)(10 * myHumidity->readHumidity());
 
     SENSOR_DATA sensorData[] =
     {
-        {{'L','U','X'},1,             {(nowLux    &0x000000ff),(nowLux    &0x0000ff00)>>8,(nowLux    &0x00ff0000)>>16,(nowLux    &0xff000000)>>24}},
-        {{'M','O','I'},1,             {(nowMoist  &0x000000ff),(nowMoist  &0x0000ff00)>>8,(nowMoist  &0x00ff0000)>>16,(nowMoist  &0xff000000)>>24}},
-        {{'H','U','M'},1,             {(nowHumid  &0x000000ff),(nowHumid  &0x0000ff00)>>8,(nowHumid  &0x00ff0000)>>16,(nowHumid  &0xff000000)>>24}},
-        {{'T','M','P'},nowTemp<0?-1:1,{(nowTempAbs&0x000000ff),(nowTempAbs&0x0000ff00)>>8,(nowTempAbs&0x00ff0000)>>16,(nowTempAbs&0xff000000)>>24}},
+        {{'L', 'U', 'X', '\0'}, nowLux  },
+        {{'M', 'O', 'I', '\0'}, nowMoist},
+        {{'H', 'U', 'M', '\0'}, nowHumid},
+        {{'T', 'M', 'P', '\0'}, nowTemp },
     };
 
     for(unsigned int i = 0; i < sizeof(sensorData)/sizeof(SENSOR_DATA); i++)
