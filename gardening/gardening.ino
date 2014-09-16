@@ -3,27 +3,46 @@
  Editor     : Takashi Ando
  Version    : 1.0
 
- Hardware Connections (Breakoutboard to Arduino):
+ Hardware Connections (Breakoutboard to Arduino Pro Mini):
  -VCC = 3.3V
  -GND = GND
- -SDA = A4 (use inline 10k resistor if your board is 5V)
- -SCL = A5 (use inline 10k resistor if your board is 5V)
- -Moisture line = A7
+ -SDA = A4
+ -SCL = A5
 */
 #include <Wire.h>
 #include <TSL2561.h>
 #include <HTU21D.h>
 #include <MOISTURE_SEN0114.h>
 #include <XBee.h>
+#include "gardening.h"
 
-//#define _DEBUG_GARDENING_
-
-#ifdef _DEBUG_GARDENING_
+/****************************
+ * Macro definition
+ ****************************/
+#ifdef DEBUG_GARDENING
 #include <SoftwareSerial.h>
 #define DEBUG_PRINT(...) debug_serial->print(__VA_ARGS__)
 #else
 #define DEBUG_PRINT(...)
 #endif
+
+/****************************
+ * Global variables
+ ****************************/
+#ifdef DEBUG_GARDENING
+static SoftwareSerial *debug_serial= NULL;
+#endif
+
+static XBee myXBee = XBee();
+static XBeeAddress64 addrContributor = XBeeAddress64(XBEE_ADDRESS_H_COORDINATOR, XBEE_ADDRESS_L_COORDINATOR);
+
+static MOISTURE_SEN0114 *myMoisture = NULL;
+static HTU21D *myHumidity = NULL;
+static TSL2561 *myLight = NULL;
+
+static unsigned int lightIntegrationTime = 0;
+static unsigned int mainLoopInterval = MAIN_INTERVAL_MSEC;
+
 /****************************
  * internal functions
  ****************************/
@@ -73,44 +92,17 @@ void indicateStatsOnLed(XBee &myXBee)
 /****************************
  * main routine
  ****************************/
-#ifdef _DEBUG_GARDENING_
-static unsigned int debug_serial_rx_pin = 8;
-static unsigned int debug_serial_tx_pin = 9;
-static SoftwareSerial *debug_serial= NULL;
-#endif
-
-static XBee myXBee = XBee();
-static XBeeAddress64 addrContributor = XBeeAddress64(0x0013A200, 0x40B4500A);
-
-static MOISTURE_SEN0114 *myMoisture = NULL;
-static HTU21D *myHumidity = NULL;
-static TSL2561 *myLight = NULL;
-
-// If gain = false (0), device is set to low gain (1X)
-// If gain = high (1), device is set to high gain (16X)
-static boolean lightGain = false;
-// If time = 0, integration will be 13.7ms
-// If time = 1, integration will be 101ms
-// If time = 2, integration will be 402ms
-// If time = 3, use manual start / stop to perform your own integration
-static unsigned char lightIntegrationTimeIndex = 2;
-// Integration ("shutter") time in milliseconds
-static unsigned int lightIntegrationTime = 0;
-
-// If the interval is lower than integration time, setup() set the integration time as minimum.
-static unsigned int mainLoopInterval = 6000;
-
 void setup()
 {
-#ifdef _DEBUG_GARDENING_
-    debug_serial = new SoftwareSerial(debug_serial_rx_pin, debug_serial_tx_pin);
-    debug_serial->begin(9600);
+#ifdef DEBUG_GARDENING
+    debug_serial = new SoftwareSerial(DEBUG_SERIAL_RX_PIN, DEBUG_SERIAL_TX_PIN);
+    debug_serial->begin(DEBUG_SERIAL_BAURATE);
 #endif
 
-    Serial.begin(9600);
+    Serial.begin(XBEE_SERIAL_BAURATE);
     myXBee.setSerial(Serial);
 
-    myMoisture = new MOISTURE_SEN0114(700, 7);
+    myMoisture = new MOISTURE_SEN0114(MOIST1_MAX, MOIST1_READ_PIN);
     myHumidity = new HTU21D();
     myHumidity->begin();
     myLight = new TSL2561();
@@ -120,18 +112,12 @@ void setup()
     // requested integration time in ms (this will be useful later):
     // The sensor will now gather light during the integration time.
     // After the specified time, you can retrieve the result from the sensor.
-    myLight->setTiming(lightGain, lightIntegrationTimeIndex, lightIntegrationTime);
+    myLight->setTiming(LIGHT_GAIN, LIGHT_INTEGRATION_TIME_INDEX , lightIntegrationTime);
     myLight->setPowerUp();
 
     if(mainLoopInterval < lightIntegrationTime)
         mainLoopInterval = lightIntegrationTime;
 }
-
-typedef struct _SENSOR_DATA
-{
-    unsigned char type[4]; // ex. MOI means moisture
-    long value;            // value got from sensor *10 to indicate decimal part.
-}SENSOR_DATA;
 
 void loop()
 {
@@ -148,7 +134,7 @@ void loop()
     if (myLight->getData(lightData0, lightData1))
     {
         // Perform lux calculation:
-        myLight->getLux(lightGain, lightIntegrationTime, lightData0, lightData1, nowLuxDouble);
+        myLight->getLux(LIGHT_GAIN, lightIntegrationTime, lightData0, lightData1, nowLuxDouble);
         nowLux = (long)(10 * nowLuxDouble);
     }
 
