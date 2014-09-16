@@ -129,8 +129,8 @@ void setup()
 
 typedef struct _SENSOR_DATA
 {
-    unsigned char type[3];  // MOI means moisture
-    unsigned char sign;     // 0:plus, 1:minus
+    unsigned char type[3];  // ex. MOI means moisture
+    char sign;              // -1 or 1
     unsigned char value[4]; // value got from sensor *10 to indicate decimal part.
 }SENSOR_DATA;
 
@@ -163,7 +163,7 @@ void loop()
     {
         {
             {'L', 'U', 'X'},
-            0,
+            1,
             {
                 (nowLux & 0x000000ff),
                 (nowLux & 0x0000ff00) >> 8,
@@ -173,7 +173,7 @@ void loop()
         },
         {
             {'M', 'O', 'I'},
-            0,
+            1,
             {
                 (nowMoist & 0x000000ff),
                 (nowMoist & 0x0000ff00) >> 8,
@@ -183,7 +183,7 @@ void loop()
         },
         {
             {'H', 'U', 'M'},
-            0,
+            1,
             {
                 (nowHumid & 0x000000ff),
                 (nowHumid & 0x0000ff00) >> 8,
@@ -193,7 +193,7 @@ void loop()
         },
         {
             {'T', 'M', 'P'},
-            nowTemp < 0 ? 1 : 0,
+            nowTemp < 0 ? -1 : 1,
             {
                 (nowTempNoSign & 0x000000ff),
                 (nowTempNoSign & 0x0000ff00) >> 8,
