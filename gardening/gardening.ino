@@ -80,8 +80,12 @@ void flashLed(int times, int wait)
     }
 }
 
-void indicateStatsOnLed(XBee &myXBee)
+void indicateStatusXBee(XBee &myXBee)
 {
+    uint8_t api_id = 0;
+    uint8_t delivery_status = 0;
+    bool error = false;
+
     // if there is no problem on conmunication, LED is not lighten.
     ZBTxStatusResponse txStatus = ZBTxStatusResponse();
 
@@ -90,8 +94,10 @@ void indicateStatsOnLed(XBee &myXBee)
     if (myXBee.readPacket(500))
     {
         // should be a znet tx status
-        if (myXBee.getResponse().getApiId() != ZB_TX_STATUS_RESPONSE)
+        api_id = myXBee.getResponse().getApiId();
+        if (api_id != ZB_TX_STATUS_RESPONSE)
         {
+            DEBUG_PRINT("Error: API ID is ");DEBUG_PRINT(api_id);DEBUG_PRINT("\n");
             flashLed(5, 500);
             return;
         }
@@ -99,13 +105,27 @@ void indicateStatsOnLed(XBee &myXBee)
         myXBee.getResponse().getZBTxStatusResponse(txStatus);
 
         // get the delivery status, the fifth byte
-        if (txStatus.getDeliveryStatus() != SUCCESS)
+        delivery_status = txStatus.getDeliveryStatus();
+        if (delivery_status != SUCCESS)
+        {
+            DEBUG_PRINT("Error: Delivery status is ");DEBUG_PRINT(delivery_status);DEBUG_PRINT("\n");
             flashLed(4, 500);
+        }
     }
-    else if (myXBee.getResponse().isError())
-        flashLed(3, 500);
     else
-        flashLed(2, 50);
+    {
+        error = myXBee.getResponse().isError();
+        if (error)
+        {
+            DEBUG_PRINT("Error: Response error.");DEBUG_PRINT("\n");
+            flashLed(3, 500);
+        }
+        else
+        {
+            DEBUG_PRINT("Error: Another.");DEBUG_PRINT("\n");
+            flashLed(2, 50);
+        }
+    }
 }
 
 /****************************
@@ -172,7 +192,7 @@ void loop()
     myXBee.send(myTxRequest);
 
     // this function takes 500ms as max when timeout error.
-    indicateStatsOnLed(myXBee);
+    indicateStatusXBee(myXBee);
 
     DEBUG_PRINT("Luminosity:");  DEBUG_PRINT(sensorData[E_SENSOR_LUMINOSITY].value/10.0); DEBUG_PRINT("[lm]\n");
     DEBUG_PRINT("Moisture :");   DEBUG_PRINT(sensorData[E_SENSOR_MOISTURE].value/10.0);   DEBUG_PRINT("[%]\n");
