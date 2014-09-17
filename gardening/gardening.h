@@ -43,14 +43,14 @@ typedef struct _SENSOR_DATA
     long value;            // value got from sensor *10 to indicate decimal part.
 }SENSOR_DATA;
 
-typedef enum _SENSOR_DATA_ENUM
+typedef enum _SENSOR_ARRAY_NUM
 {
     E_SENSOR_LUMINOSITY = 0,
     E_SENSOR_MOISTURE,
     E_SENSOR_HUMIDITY,
     E_SENSOR_TEMPERATURE,
     E_SENSOR_MAX,
-}SENSOR_DATA_ENUM;
+}SENSOR_ARRAY_NUM;
 
 #endif
 
