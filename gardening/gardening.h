@@ -4,13 +4,17 @@
 /****************************
  * Macro definition
  ****************************/
-#define DEBUG_GARDENING
+//#define DEBUG_GARDENING
 #define DEBUG_SERIAL_RX_PIN (8)
 #define DEBUG_SERIAL_TX_PIN (9)
 #define DEBUG_SERIAL_BAURATE (9600)
 
 // If the interval is less than integration time, setup() set the integration time as minimum.
+#ifdef DEBUG_GARDENING
 #define MAIN_INTERVAL_MSEC (10000)
+#else
+#define MAIN_INTERVAL_MSEC (300000)
+#endif
 
 // If gain = false (0), device is set to low gain (1X)
 // If gain = high (1), device is set to high gain (16X)
