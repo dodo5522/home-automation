@@ -38,7 +38,8 @@
  ****************************/
 typedef struct _SENSOR_DATA
 {
-    unsigned char type[4]; // ex. MOI means moisture
+    unsigned char type[3]; // ex. MOI means moisture
+    unsigned char reserved[1];
     long value;            // value got from sensor *10 to indicate decimal part.
 }SENSOR_DATA;
 
