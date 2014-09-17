@@ -162,10 +162,10 @@ void loop()
     unsigned char sendData[sizeof(SENSOR_DATA) * E_SENSOR_MAX] = {0,};
     SENSOR_DATA sensorData[E_SENSOR_MAX] =
     {
-        {{'L', 'U', 'X'}, 0, 0},
-        {{'M', 'O', 'I'}, 0, 0},
-        {{'H', 'U', 'M'}, 0, 0},
-        {{'T', 'M', 'P'}, 0, 0},
+        {{'L', 'U', 'X'}, {0}, 0},
+        {{'M', 'O', 'I'}, {0}, 0},
+        {{'H', 'U', 'M'}, {0}, 0},
+        {{'T', 'M', 'P'}, {0}, 0},
     };
 
     if (isTriggerToPost() != true)
