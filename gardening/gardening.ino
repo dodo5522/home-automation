@@ -36,12 +36,13 @@ static SoftwareSerial debug_serial = SoftwareSerial(DEBUG_SERIAL_RX_PIN, DEBUG_S
 static XBee myXBee = XBee();
 static XBeeAddress64 addrContributor = XBeeAddress64(XBEE_ADDRESS_H_COORDINATOR, XBEE_ADDRESS_L_COORDINATOR);
 
-static MOISTURE_SEN0114 myMoisture = MOISTURE_SEN0114(MOIST1_MAX, MOIST1_READ_PIN);
+static MOISTURE_SEN0114 myMoisture0 = MOISTURE_SEN0114(MOIST0_MAX, MOIST0_READ_PIN);
+static MOISTURE_SEN0114 myMoisture1 = MOISTURE_SEN0114(MOIST1_MAX, MOIST1_READ_PIN);
 static HTU21D myHumidity = HTU21D();
 static TSL2561 myLight = TSL2561();
 
 static unsigned int lightIntegrationTime = 0;
-static unsigned int mainLoopInterval = MAIN_INTERVAL_MSEC;
+static unsigned long mainLoopInterval = MAIN_INTERVAL_MSEC;
 
 /****************************
  * internal functions
@@ -162,10 +163,11 @@ void loop()
     unsigned char sendData[sizeof(SENSOR_DATA) * E_SENSOR_MAX] = {0,};
     SENSOR_DATA sensorData[E_SENSOR_MAX] =
     {
-        {{'L', 'U', 'X'}, {0}, 0},
-        {{'M', 'O', 'I'}, {0}, 0},
-        {{'H', 'U', 'M'}, {0}, 0},
-        {{'T', 'M', 'P'}, {0}, 0},
+        {{'L', 'U', 'X'}, '0', 0},
+        {{'M', 'O', 'I'}, '0', 0}, // for small planter
+        {{'M', 'O', 'I'}, '1', 0}, // for large planter
+        {{'H', 'U', 'M'}, '0', 0},
+        {{'T', 'M', 'P'}, '0', 0},
     };
 
     if (isTriggerToPost() != true)
@@ -180,7 +182,8 @@ void loop()
 
     sensorData[E_SENSOR_TEMPERATURE].value = (long)(10 * myHumidity.readTemperature());
     sensorData[E_SENSOR_HUMIDITY].value    = (long)(10 * myHumidity.readHumidity());
-    sensorData[E_SENSOR_MOISTURE].value    = (long)(10 * myMoisture.getMoisturePercent());
+    sensorData[E_SENSOR_MOISTURE0].value   = (long)(10 * myMoisture0.getMoisturePercent());
+    sensorData[E_SENSOR_MOISTURE1].value   = (long)(10 * myMoisture1.getMoisturePercent());
 
     memcpy(sendData, sensorData, sizeof(sendData));
 
@@ -195,7 +198,8 @@ void loop()
     indicateStatusXBee(myXBee);
 
     DEBUG_PRINT("Luminosity:");  DEBUG_PRINT(sensorData[E_SENSOR_LUMINOSITY].value/10.0); DEBUG_PRINT("[lm]\n");
-    DEBUG_PRINT("Moisture :");   DEBUG_PRINT(sensorData[E_SENSOR_MOISTURE].value/10.0);   DEBUG_PRINT("[%]\n");
+    DEBUG_PRINT("Moisture0 :");  DEBUG_PRINT(sensorData[E_SENSOR_MOISTURE0].value/10.0);  DEBUG_PRINT("[%]\n");
+    DEBUG_PRINT("Moisture1 :");  DEBUG_PRINT(sensorData[E_SENSOR_MOISTURE1].value/10.0);  DEBUG_PRINT("[%]\n");
     DEBUG_PRINT("Humidity :");   DEBUG_PRINT(sensorData[E_SENSOR_HUMIDITY].value/10.0);   DEBUG_PRINT("[%]\n");
     DEBUG_PRINT("Temperature :");DEBUG_PRINT(sensorData[E_SENSOR_TEMPERATURE].value/10.0);DEBUG_PRINT("[C]\n");
 }

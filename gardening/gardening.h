@@ -28,10 +28,11 @@
 // 0  ~300 : dry soil
 // 300~700 : humid soil
 // 700~950 : in water
-#define MOIST1_MAX (700)
-#define MOIST1_READ_PIN (2)
-#define MOIST2_MAX (MOIST1_MAX)
-#define MOIST2_READ_PIN (3)
+#define MOIST_MAX (700)
+#define MOIST0_READ_PIN (6)
+#define MOIST1_READ_PIN (7)
+#define MOIST0_MAX (MOIST_MAX)
+#define MOIST1_MAX (MOIST_MAX)
 
 #define XBEE_SERIAL_BAURATE (9600)
 #define XBEE_ADDRESS_H_COORDINATOR (0x0013A200)
@@ -43,14 +44,15 @@
 typedef struct _SENSOR_DATA
 {
     unsigned char type[3]; // ex. MOI means moisture
-    unsigned char reserved[1];
+    unsigned char number;  // number of the same type's multiple sensor
     long value;            // value got from sensor *10 to indicate decimal part.
 }SENSOR_DATA;
 
 typedef enum _SENSOR_ARRAY_NUM
 {
     E_SENSOR_LUMINOSITY = 0,
-    E_SENSOR_MOISTURE,
+    E_SENSOR_MOISTURE0,
+    E_SENSOR_MOISTURE1,
     E_SENSOR_HUMIDITY,
     E_SENSOR_TEMPERATURE,
     E_SENSOR_MAX,
