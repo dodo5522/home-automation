@@ -4,3 +4,6 @@
 [submodule "documents/schematic/dfrobot"]
 	path = documents/schematic/dfrobot
 	url = https://github.com/DFRobot/Fritzing-library
+[submodule "nodes/libraries/XBee"]
+	path = nodes/libraries/XBee
+	url = https://code.google.com/p/xbee-arduino
