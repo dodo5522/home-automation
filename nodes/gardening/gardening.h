@@ -28,11 +28,8 @@
 // 0  ~300 : dry soil
 // 300~700 : humid soil
 // 700~950 : in water
-#define MOIST_MAX (700)
-#define MOIST0_READ_PIN (6)
-#define MOIST1_READ_PIN (7)
-#define MOIST0_MAX (MOIST_MAX)
-#define MOIST1_MAX (MOIST_MAX)
+#define MOIST0_READ_PIN (0)
+#define MOIST1_READ_PIN (1)
 
 #define XBEE_SERIAL_BAURATE (9600)
 #define XBEE_ADDRESS_H_COORDINATOR (0x0013A200)
