@@ -17,7 +17,6 @@ import xively
 _XBEE_PORT = '/dev/ttyAMA0'
 _XBEE_BAUDRATE = 9600
 
-_XIVELY_API_KEY = 'ov5DHZ4sIWyS4M5wiNthJjKmkwtZmRAR3lKCzsBOdjKN0Tgm'
 _XIVELY_FEED_ID = 1779591762
 _XIVELY_ID_TABLE = \
 {
@@ -68,19 +67,20 @@ def message_received(feed, data, now):
 
 if __name__ == '__main__':
     ser = serial.Serial(_XBEE_PORT, _XBEE_BAUDRATE)
-
-    api = xively.XivelyAPIClient(_XIVELY_API_KEY)
-    feed = api.feeds.get(_XIVELY_FEED_ID)
     
     kargs = {}
     kargs['escaped'] = True
     #kargs['callback'] = message_received
     
-    # Create API object, which spawns a new thread
     if len(sys.argv) > 1:
-        xbee = None
+        if 'debug' in sys.argv:
+            xbee = None
+        else:
+            xbee = ZigBee(ser, **kargs)
+            api = xively.XivelyAPIClient(sys.argv[1])
+            feed = api.feeds.get(_XIVELY_FEED_ID)
     else:
-        xbee = ZigBee(ser, **kargs)
+        raise SystemError('Xively API key is required.')
     
     # Do other stuff in the main thread
     while True:
