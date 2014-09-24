@@ -4,16 +4,9 @@
  */
 #include "MOISTURE_SEN0114.h"
 
-MOISTURE_SEN0114::MOISTURE_SEN0114(void)
+MOISTURE_SEN0114::MOISTURE_SEN0114(unsigned char pin, unsigned int max, unsigned int min)
+    :max_moisture(max), min_moisture(min), pin_analog(pin)
 {
-    max_moisture = 700;
-    pin_analog = 7;
-}
-
-MOISTURE_SEN0114::MOISTURE_SEN0114(unsigned int max, unsigned char pin)
-{
-    max_moisture = max;
-    pin_analog = pin;
 }
 
 MOISTURE_SEN0114::~MOISTURE_SEN0114(void)
@@ -40,8 +33,10 @@ float MOISTURE_SEN0114::getMoistureRatio()
 
     if(raw_value > max_moisture)
         raw_value = max_moisture;
+    else if(raw_value < min_moisture)
+        raw_value = min_moisture;
 
-    ratio = (float)raw_value / (float)max_moisture;
+    ratio = (float)(raw_value - min_moisture) / (float)(max_moisture - min_moisture);
     return ratio;
 }
 

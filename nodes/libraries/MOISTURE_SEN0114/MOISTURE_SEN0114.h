@@ -8,13 +8,12 @@ class MOISTURE_SEN0114
 {
     public:
         /*
-         * Analog read value threshold is 700 as default.
+         * Analog read value max threshold is 550 as default.
+         * Analog read value min threshold is 50 as default.
          * Analog read pin is 7 as default.
          */
-        MOISTURE_SEN0114(void);
-        MOISTURE_SEN0114(unsigned int max, unsigned char pin);
-
-        ~MOISTURE_SEN0114(void);
+        MOISTURE_SEN0114(unsigned char pin = 7, unsigned int max = 550, unsigned int min = 50);
+        virtual ~MOISTURE_SEN0114(void);
 
         /*
          * Return value from 0 to 100 with unit %.
@@ -38,6 +37,7 @@ class MOISTURE_SEN0114
 
     private:
         unsigned int max_moisture;
+        unsigned int min_moisture;
         unsigned char pin_analog;
 };
 
