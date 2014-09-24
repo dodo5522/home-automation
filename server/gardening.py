@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 
 """
-receive_samples_async.py
-
-By Paul Malmsten, 2010
-pmalmsten@gmail.com
-
-This example reads the serial port and asynchronously processes IO data
-received from a remote XBee.
+ Example code for server side on raspberry pi for my gardening.
+ Editor     : Takashi Ando
+ Version    : 1.0
 """
 from xbee import ZigBee
 from requests.exceptions import HTTPError
