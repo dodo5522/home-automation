@@ -1,8 +1,8 @@
 # Home automation
 
-This repository is for my home automation by using Raspberry Pi and Arduino.
-The automated gardening is working now.
-Another function does not work yet.
+This repository is for my home automation by using Raspberry Pi and Arduino.  
+The automated gardening is working now.  
+Another function does not work yet.  
 
 # System design
 
