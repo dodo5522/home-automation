@@ -160,7 +160,6 @@ void loop()
     unsigned int lightData0 = 0;
     unsigned int lightData1 = 0;
     double nowLuxDouble = 0.0;
-    unsigned char sendData[sizeof(SENSOR_DATA) * E_SENSOR_MAX] = {0,};
     SENSOR_DATA sensorData[E_SENSOR_MAX] =
     {
         {{'L', 'U', 'X'}, '0', 0},
@@ -185,12 +184,10 @@ void loop()
     sensorData[E_SENSOR_MOISTURE0].value   = (long)(10 * myMoisture0.getMoisturePercent());
     sensorData[E_SENSOR_MOISTURE1].value   = (long)(10 * myMoisture1.getMoisturePercent());
 
-    memcpy(sendData, sensorData, sizeof(sendData));
-
     ZBTxRequest myTxRequest = ZBTxRequest(
             addrContributor,
-            (uint8_t*)sendData,
-            sizeof(sendData));
+            (uint8_t*)sensorData,
+            sizeof(sensorData));
 
     myXBee.send(myTxRequest);
 
