@@ -7,3 +7,6 @@
 [submodule "nodes/libraries/XBee"]
 	path = nodes/libraries/XBee
 	url = https://code.google.com/p/xbee-arduino
+[submodule "nodes/libraries/Adafruit_INA219"]
+	path = nodes/libraries/Adafruit_INA219
+	url = https://github.com/adafruit/Adafruit_INA219.git
