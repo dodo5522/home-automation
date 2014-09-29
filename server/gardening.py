@@ -35,15 +35,11 @@ class GardeningMonitor(multiprocessing.Process):
 
         ser = serial.Serial(self._XBEE_PORT, self._XBEE_BAUDRATE)
 
-        kargs = {}
-        kargs['escaped'] = True
-        #kargs['callback'] = message_received
-        
         if len(sys.argv) > 1:
             if 'debug' in sys.argv:
                 xbee = None
             else:
-                xbee = xbee.ZigBee(ser, **kargs)
+                xbee = xbee.ZigBee(ser, escaped=True)
                 api = xively.XivelyAPIClient(sys.argv[1])
                 feed = api.feeds.get(_XIVELY_FEED_ID)
         else:
@@ -74,10 +70,10 @@ class GardeningMonitor(multiprocessing.Process):
             # halt() must be called before closing the serial
             # port in order to ensure proper thread shutdown
             if xbee is not None:
-            xbee.halt()
+                xbee.halt()
             ser.close()
 
-    def message_received(feed, data, now):
+    def _parse_xbee_data(data, now):
         print(now)
     
         source_addr_long_raw = [byte for byte in struct.unpack('BBBBBBBB', data['source_addr_long'])]
