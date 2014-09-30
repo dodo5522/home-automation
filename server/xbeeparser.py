@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 
+"""
+ Class implementation to receive data of sensors via XBee.
+ Editor     : Takashi Ando
+ Version    : 1.0
+"""
+
 import datetime
 import logging
 import struct

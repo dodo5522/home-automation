@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
 """
- Example code for server side on raspberry pi for my gardening.
+ Server side code for my gardening.
  Editor     : Takashi Ando
  Version    : 1.0
 """
+
 import sys
 import datetime
 import struct
