@@ -14,7 +14,7 @@ import multiprocessing
 import xively
 from requests.exceptions import HTTPError
 
-import xbeeparser
+import xbeereceiver
 
 class GardeningMonitor(multiprocessing.Process, xbeeparser.XBeeParser):
     '''

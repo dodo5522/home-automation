@@ -12,7 +12,70 @@ import struct
 import serial
 from xbee import ZigBee
 
-class XBeeParser(object):
+class SensorData(object):
+    '''
+    Class to store the data got from sensor.
+    '''
+    def __init__(self, sensor_id=None, value=0.0):
+        if isinstance(sensor_id, str) is False:
+            raise ValueError('sensor_id should be string.')
+        self._sensor_id = sensor_id
+
+        if isinstance(value, float) is False:
+            raise ValueError('value should be float.')
+        self._value = value
+
+    def __str__(self):
+        return self._sensor_id
+
+    def __repr__(self):
+        return self._sensor_id
+
+    def get_value(self):
+        '''
+        Get the value.
+        '''
+        return self._value
+
+    def set_value(self, value):
+        '''
+        Set the value.
+        '''
+        if isinstance(value, float) is False:
+            raise ValueError('value should be float.')
+        self._value = value
+
+class XBeeNode(object):
+    '''
+    Class to store the information of XBee node.
+    '''
+    def __init__(self, node_name=None, source_addr_long=0, source_addr=0, sensor_ids=()):
+        self._node_name = node_name
+        self._source_addr_long = source_addr_long
+        self._source_addr = source_addr
+
+        self._sensor_data = []
+        for sensor_id in sensor_ids:
+            sensor_data = SensorData(sensor_id=sensor_id)
+            self._sensor_data.append(sensor_data)
+
+    def __str__(self):
+        return self._node_name
+
+    def __repr__(self):
+        return self._node_name
+
+    def set_source_addr_long(self, source_addr_long):
+        '''
+        '''
+        self._source_addr_long = source_addr_long
+
+    def set_source_addr(self, source_addr):
+        '''
+        '''
+        self._source_addr = source_addr
+
+class XBeeReceiver(object):
     '''
     Class with functions to communicate with XBee ZB.
     '''
@@ -26,7 +89,7 @@ class XBeeParser(object):
         log_format = '%(asctime)-15s %(module)-8s %(message)s'
         logging.basicConfig(format=log_format)
 
-        self._logger = logging.getLogger('XBeeParser')
+        self._logger = logging.getLogger('XBeeReceiver')
         self._logger.setLevel(debug_level)
 
         self._port = port
@@ -34,8 +97,7 @@ class XBeeParser(object):
         self._sensors = sensors
         ser = serial.Serial(self._port, self._baurate)
         self._xbee = ZigBee(ser, escaped=True)
-
-        self._parsed_data = {}
+        self._sensordata = SensorData(sensors=self._sensors)
 
     def wait_for_api_frame(self):
         '''
