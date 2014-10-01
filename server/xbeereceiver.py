@@ -75,16 +75,53 @@ class XBeeNode(object):
         '''
         self._source_addr = source_addr
 
-class XBeeReceiver(object):
+class XBeeParser(object):
+    '''
+    '''
+    def __init(self):
+        '''
+        '''
+        pass
+
+    def get_node_info(self, raw_data):
+        '''
+        Parse and return the XBee node information (source address etc.)
+        '''
+        src_addr_raw = [byte for byte in struct.unpack('BBBBBBBB', raw_data['source_addr_long'])]
+        self._parsed_data['source_addr_long'] = 0
+        for i in range(0, 8):
+            self._logger.info('SRC[%d]: %s'.format(i, hex(src_addr_raw[i])))
+            self._parsed_data['source_addr_long'] |= src_addr_raw[i] << 8 * (7 - i)
+
+        net_addr_raw = [byte for byte in struct.unpack('BB', raw_data['source_addr'])]
+        self._parsed_data['source_addr'] = 0
+        for i in range(0, 2):
+            self._logger.info('NET[%d]: %s'.format(i, hex(net_addr_raw[i])))
+            self._parsed_data['source_addr'] |= net_addr_raw[i] << 8 * (1 - i)
+
+        self._logger.info('ID: %s'.format(raw_data['id']))
+        self._parsed_data['id'] = raw_data['id']
+
+        #self._logger.info('OPT: %s'.format(data['options']))
+        #self._parsed_data['options'] = data['options']
+
+    def get_sensed_info(self, raw_data):
+        '''
+        Parse and return the information from sensors mounted on XBee module.
+        '''
+        raise NotImplementedError('Should be implemented at inherited class.')
+
+class XBeeReceiver(XBeeParser):
     '''
     Class with functions to communicate with XBee ZB.
+    This instance should be only one on server side.
     '''
 
     def __init__(self, port='/dev/ttyAMA0', baurate=9600, \
-            sensors=5, debug_level=logging.WARN):
+            debug_level=logging.WARN):
         '''
-        port and baurate should be set to same values with XBee sensor module.
-        And sensors should be set to the number of sensor mounted on it.
+        Initialize XBee instance with serial port and baurate.
+        The baurate should be set to same value with XBee module.
         '''
         log_format = '%(asctime)-15s %(module)-8s %(message)s'
         logging.basicConfig(format=log_format)
@@ -94,38 +131,21 @@ class XBeeReceiver(object):
 
         self._port = port
         self._baurate = baurate
-        self._sensors = sensors
         ser = serial.Serial(self._port, self._baurate)
         self._xbee = ZigBee(ser, escaped=True)
-        self._sensordata = SensorData(sensors=self._sensors)
 
     def wait_for_api_frame(self):
         '''
-        Wait for API frame and store the parsed data got from XBee ZB.
-        The parsed data is dictionary format.
-        The parsed data can be got with get_parsed_data() method.
+        Wait for API frame from XBee module.
+        And return the node information (source address etc.) and another data.
         '''
+        raw_data = self._xbee.wait_read_frame()
+        return (self.get_node_info(raw_data), self.get_sensed_info(raw_data))
 
-        data = self._xbee.wait_read_frame()
-
-        src_addr_raw = [byte for byte in struct.unpack('BBBBBBBB', data['source_addr_long'])]
-        self._parsed_data['source_addr_long'] = 0
-        for i in range(0, 8):
-            self._logger.info('SRC[%d]: %s'.format(i, hex(src_addr_raw[i])))
-            self._parsed_data['source_addr_long'] |= src_addr_raw[i] << 8 * (7 - i)
-
-        net_addr_raw = [byte for byte in struct.unpack('BB', data['source_addr'])]
-        self._parsed_data['source_addr'] = 0
-        for i in range(0, 2):
-            self._logger.info('NET[%d]: %s'.format(i, hex(net_addr_raw[i])))
-            self._parsed_data['source_addr'] |= net_addr_raw[i] << 8 * (1 - i)
-
-        self._logger.info('ID: %s'.format(data['id']))
-        self._parsed_data['id'] = data['id']
-
-        #self._logger.info('OPT: %s'.format(data['options']))
-        #self._parsed_data['options'] = data['options']
-
+    def get_sensed_info(self, raw_data):
+        '''
+        Parse and return the information from sensors mounted on XBee module.
+        '''
         rf_data_format = ['4sl' for i in range(0, self._sensors)]
         rf_data_format = ''.join(rf_data_format)
         rf_data = struct.unpack(rf_data_format, data['rf_data'])
@@ -139,10 +159,4 @@ class XBeeReceiver(object):
 
             self._parsed_data[sensor_type] = sensor_value
             self._logger.info('TYPE,VAL: %s,%f'.format(sensor_type, sensor_value))
-
-    def get_parsed_data(self):
-        '''
-        Get the already parsed data.
-        '''
-        return self._parsed_data
 
