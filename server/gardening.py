@@ -13,12 +13,12 @@ import time
 import multiprocessing
 import xively
 from requests.exceptions import HTTPError
+from xbeereceiver import XBeeApiFrameParser
 
-import xbeereceiver
-
-class GardeningMonitor(multiprocessing.Process, xbeeparser.XBeeParser):
+class GardeningMonitor(multiprocessing.Process, XBeeApiFrameParser):
     '''
-    Class to monitor gardening with XBee ZB and Xively.
+    This class monitors gardening status with XBee.
+    And put the information to Xively.
     '''
 
     _XIVELY_FEED_ID = 1779591762
@@ -31,9 +31,9 @@ class GardeningMonitor(multiprocessing.Process, xbeeparser.XBeeParser):
         'TMP0':'Temperature',
     }
 
-    def __init__(self, group=None, target=None, name=None, args=(), kwargs={}):
-        multiprocessing.Process.__init__(self, group=group, target=target,\
-                name=name, args=args, kwargs=kwargs, daemon=None)
+    def __init__(self, target=None, name=None, args=(), kwargs={}):
+        multiprocessing.Process.__init__(self, \
+                target=target, name=name, args=args, kwargs=kwargs, daemon=None)
 
         if len(sys.argv) > 1:
             api = xively.XivelyAPIClient(sys.argv[1])
@@ -48,24 +48,23 @@ class GardeningMonitor(multiprocessing.Process, xbeeparser.XBeeParser):
         if self._target:
             self._target(*self._args, **self._kwargs)
         else:
-            while True:
-                try:
-                    if xbee is None:
-                        ser.read()
-                    else:
-                        datastreams = []
-                        parse()
-                        now = datetime.datetime.utcnow()
-                        self._logger.info(now)
-                        datastreams.append(xively.Datastream(id=_XIVELY_ID_TABLE[sensor_type], current_value=sensor_value, at=now))
-                        feed.datastreams = datastreams
-                        feed.update()
-                except HTTPError:
-                    print('HTTPError occurs.')
-                    time.sleep(600)
-                    continue
-                except KeyboardInterrupt:
-                    break
+            try:
+                if xbee is None:
+                    ser.read()
+                else:
+                    datastreams = []
+                    parse()
+                    now = datetime.datetime.utcnow()
+                    self._logger.info(now)
+                    datastreams.append(xively.Datastream(id=_XIVELY_ID_TABLE[sensor_type], current_value=sensor_value, at=now))
+                    feed.datastreams = datastreams
+                    feed.update()
+            except HTTPError:
+                print('HTTPError occurs.')
+                time.sleep(600)
+                continue
+            except KeyboardInterrupt:
+                break
 
             # halt() must be called before closing the serial
             # port in order to ensure proper thread shutdown
