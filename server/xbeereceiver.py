@@ -16,12 +16,13 @@ class XBeeApiFrameParser(object):
     This class translate the API frame to node information and sensor data.
     But sensor data parsing function should be implemented by user.
     '''
-    def __init(self, sensors=0):
+    def __init__(self, sensors=0, log_level=logging.INFO):
         '''
         This parser should be initialized with the number of mounted sensors.
         '''
         self._sensors = sensors
         self._logger = logging.getLogger(type(self).__name__)
+        self._logger.setLevel(log_level)
 
     def get_node_info(self, api_frame):
         '''
@@ -75,12 +76,13 @@ class XBeeReceiver(object):
     This instance should be only one on server side.
     '''
 
-    def __init__(self, port='/dev/ttyAMA0', baurate=9600):
+    def __init__(self, port='/dev/ttyAMA0', baurate=9600, log_level=logging.INFO):
         '''
         Initialize XBee instance with serial port and baurate.
         The baurate should be set to same value with XBee module.
         '''
         self._logger = logging.getLogger(type(self).__name__)
+        self._logger.setLevel(log_level)
 
         self._port = port
         self._baurate = baurate

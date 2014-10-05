@@ -9,10 +9,23 @@ import logging
 import xbeereceiver
 import gardening
 
+LOGGING_FORMAT_BASIC = '%(asctime)s %(name)-8s %(levelname)-8s: %(message)s'
+LOGGING_FORMAT_DATE = '%Y/%m/%d %H:%M:%S'
+
 if __name__ == '__main__':
-    # Do other stuff in the main thread
-    log_format = '%(asctime)-15s %(module)-8s %(message)s'
-    logging.basicConfig(format=log_format)
+    # root logger setting with default Formatter and StreamHandler.
+    logging.basicConfig(level=logging.INFO,
+            format=LOGGING_FORMAT_BASIC,
+            datefmt=LOGGING_FORMAT_DATE)
+
+    # add logging handler of file to root logger.
+    formatter = logging.Formatter(fmt=LOGGING_FORMAT_BASIC, datefmt=LOGGING_FORMAT_DATE)
+    handler = logging.FileHandler('/tmp/test.log', mode='a')
+    handler.setFormatter(formatter)
+    logging.getLogger().addHandler(handler)
+    #logging.getLogger().removeHandler(handler)
+
+    main_logger = logging.getLogger(name=__name__)
 
     monitors = []
     monitors.append(gardening.GardeningMonitor())
