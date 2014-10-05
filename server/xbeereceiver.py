@@ -62,6 +62,13 @@ class XBeeApiFrameBaseParser(object):
         self._logger.info('OPT: %s'.format(api_frame['options']))
         return api_frame['options']
 
+    def get_rf_data(self, api_frame):
+        '''
+        Parse and return 'rf_data' value got from XBee node.
+        '''
+        self._logger.info('rf_data: %s'.format(api_frame['rf_data']))
+        return api_frame['rf_data']
+
 class XBeeApiFrameParser(XBeeApiFrameBaseParser):
     '''
     This class translate the API frame to node information and sensor data.
