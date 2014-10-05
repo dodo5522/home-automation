@@ -11,10 +11,60 @@ import struct
 import serial
 from xbee import ZigBee
 
-class XBeeApiFrameParser(object):
+class XBeeApiFrameBaseParser(object):
+    '''
+    This class translate the API frame to node information.
+    '''
+    def __init__(self, log_level=logging.INFO):
+        '''
+        This parser should be initialized with the number of mounted sensors.
+        '''
+        self._logger = logging.getLogger(type(self).__name__)
+        self._logger.setLevel(log_level)
+
+    def get_source_addr_long(self, api_frame):
+        '''
+        Parse and return 'source_addr_long' value got from XBee node.
+        '''
+        src_addr_raw = [byte for byte in struct.unpack('BBBBBBBB', api_frame['source_addr_long'])]
+
+        src_addr = 0
+        for i in range(0, 8):
+            self._logger.info('SRC[%d]: %s'.format(i, hex(src_addr_raw[i])))
+            src_addr |= src_addr_raw[i] << 8 * (7 - i)
+
+        return src_addr
+
+    def get_source_addr(self, api_frame):
+        '''
+        Parse and return 'source_addr' (network address) value got from XBee node.
+        '''
+        net_addr_raw = [byte for byte in struct.unpack('BB', api_frame['source_addr'])]
+
+        net_addr = 0
+        for i in range(0, 2):
+            self._logger.info('NET[%d]: %s'.format(i, hex(net_addr_raw[i])))
+            net_addr |= net_addr_raw[i] << 8 * (1 - i)
+
+        return net_addr
+
+    def get_id(self, api_frame):
+        '''
+        Parse and return 'id' value got from XBee node.
+        '''
+        self._logger.info('ID: %s'.format(api_frame['id']))
+        return api_frame['id']
+
+    def get_options(self, api_frame):
+        '''
+        Parse and return 'options' value got from XBee node.
+        '''
+        self._logger.info('OPT: %s'.format(api_frame['options']))
+        return api_frame['options']
+
+class XBeeApiFrameParser(XBeeApiFrameBaseParser):
     '''
     This class translate the API frame to node information and sensor data.
-    But sensor data parsing function should be implemented by user.
     '''
     def __init__(self, sensors=0, log_level=logging.INFO):
         '''
@@ -23,31 +73,6 @@ class XBeeApiFrameParser(object):
         self._sensors = sensors
         self._logger = logging.getLogger(type(self).__name__)
         self._logger.setLevel(log_level)
-
-    def get_node_info(self, api_frame):
-        '''
-        Parse and return the XBee node information (source address etc.)
-        '''
-        node_info = {}
-        src_addr_raw = [byte for byte in struct.unpack('BBBBBBBB', api_frame['source_addr_long'])]
-        node_info['source_addr_long'] = 0
-        for i in range(0, 8):
-            self._logger.info('SRC[%d]: %s'.format(i, hex(src_addr_raw[i])))
-            node_info['source_addr_long'] |= src_addr_raw[i] << 8 * (7 - i)
-
-        net_addr_raw = [byte for byte in struct.unpack('BB', api_frame['source_addr'])]
-        node_info['source_addr'] = 0
-        for i in range(0, 2):
-            self._logger.info('NET[%d]: %s'.format(i, hex(net_addr_raw[i])))
-            node_info['source_addr'] |= net_addr_raw[i] << 8 * (1 - i)
-
-        self._logger.info('ID: %s'.format(api_frame['id']))
-        node_info['id'] = api_frame['id']
-
-        #self._logger.info('OPT: %s'.format(data['options']))
-        #node_info['options'] = data['options']
-
-        return node_info
 
     def get_sensed_info(self, api_frame):
         '''
@@ -70,10 +95,10 @@ class XBeeApiFrameParser(object):
 
         return sensor_info
 
-class XBeeReceiver(object):
+class XBeeReceiver(XBeeApiFrameBaseParser):
     '''
     Class with functions to communicate with XBee ZB.
-    This instance should be only one on server side.
+    There should be only one instance against one XBee coordinator.
     '''
 
     def __init__(self, port='/dev/ttyAMA0', baurate=9600, log_level=logging.INFO):
