@@ -7,6 +7,8 @@ participant "Receiver" as Receiver
 participant "VegetablesMonitor" as VegetablesMonitor
 participant "SolarPowerMonitor" as SolarPowerMonitor
 
+== Initialization ==
+
 create Receiver
 Server -> Receiver : Receiver.init()
 note left
@@ -48,6 +50,8 @@ activate Receiver
 		Receiver <-- SolarPowerMonitor
 	deactivate SolarPowerMonitor
 deactivate Receiver
+
+== Termination ==
 
 Server ->> Receiver : Send message to terminate
 activate Receiver
