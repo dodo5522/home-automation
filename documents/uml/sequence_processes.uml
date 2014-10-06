@@ -8,18 +8,45 @@ participant "VegetablesMonitor" as VegetablesMonitor
 participant "SolarPowerMonitor" as SolarPowerMonitor
 
 create Receiver
-Server -> Receiver : Receiver.start()
+Server -> Receiver : Receiver.init()
 note left
 	Create receiver process
 	against a coordinator
 	mounted on server side
 end note
 
+Server -> Receiver : Receiver.start()
 activate Receiver
 	create VegetablesMonitor
-	Receiver -> VegetablesMonitor : VegetablesMonitor.start()
+	Receiver -> VegetablesMonitor : VegetablesMonitor.init()
+
 	create SolarPowerMonitor
-	Receiver -> SolarPowerMonitor : VegetablesMonitor.start()
+	Receiver -> SolarPowerMonitor : SolarPowerMonitor.init()
+
+	Receiver -> VegetablesMonitor : VegetablesMonitor.start()
+	activate VegetablesMonitor
+		VegetablesMonitor -> VegetablesMonitor : Run internal process
+		activate VegetablesMonitor
+			VegetablesMonitor ->] : Initialize xively module
+			VegetablesMonitor <--]
+			VegetablesMonitor ->] : Initialize motor driver
+			note left
+				ex. to supply water to planters
+			end note
+			VegetablesMonitor <--]
+		deactivate VegetablesMonitor
+		Receiver <-- VegetablesMonitor
+	deactivate VegetablesMonitor
+
+	Receiver -> SolarPowerMonitor : SolarPowerMonitor.start()
+	activate SolarPowerMonitor
+		SolarPowerMonitor -> SolarPowerMonitor : Run internal process
+		activate SolarPowerMonitor
+			SolarPowerMonitor ->] : Initialize xively module
+			SolarPowerMonitor <--]
+		deactivate SolarPowerMonitor
+		Receiver <-- SolarPowerMonitor
+	deactivate SolarPowerMonitor
 deactivate Receiver
 
 Server ->> Receiver : Send message to terminate
