@@ -2,13 +2,13 @@
 
 PLANTUML := plantuml.jar
 CONFIG := config.txt
-DEPEND_FILES := $(PLANTUML) $(CONFIG)
+DEPEND_FILES := makefile $(PLANTUML) $(CONFIG)
 
-all:sample.png
+all:sequence_processes.png
 
-sample.png:sample.txt $(DEPEND_FILES)
-	java -jar $(PLANTUML) -config $(CONFIG) $<
-	open $@
+%.png:%.uml $(DEPEND_FILES)
+	#java -jar $(PLANTUML) -config $(CONFIG) $<
+	java -jar $(PLANTUML) $<
 
 clean:
-	rm -f sample.png
+	rm -f *.png

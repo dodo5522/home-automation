@@ -1,0 +1,14 @@
+@startuml
+title Sequence flow diagram between all process
+
+participant "ServerProcess" as Server
+participant "VegetablesMonitorProcess" as VegetablesMonitor
+participant "SolarPowerMonitorProcess" as SolarPowerMonitor
+
+Server -> VegetablesMonitor
+Server <-- VegetablesMonitor
+
+Server -> SolarPowerMonitor
+Server <-- SolarPowerMonitor
+@enduml
+
