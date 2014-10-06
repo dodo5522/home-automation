@@ -2,10 +2,7 @@
 'title Sequence flow diagram between all process
 hide footbox
 
-participant "Server" as Server
-participant "Receiver" as Receiver
-participant "VegetablesMonitor" as VegetablesMonitor
-participant "SolarPowerMonitor" as SolarPowerMonitor
+!include sequence_common.uml
 
 == Initialization ==
 

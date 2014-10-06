@@ -1,0 +1,4 @@
+participant "Server" as Server
+participant "Receiver" as Receiver
+participant "VegetablesMonitor" as VegetablesMonitor
+participant "SolarPowerMonitor" as SolarPowerMonitor
