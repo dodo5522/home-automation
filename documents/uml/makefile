@@ -4,7 +4,7 @@ PLANTUML := plantuml.jar
 CONFIG := config.txt
 DEPEND_FILES := makefile $(PLANTUML) $(CONFIG)
 
-all:sequence_processes.png
+all:sequence_init_term.png
 
 %.png:%.uml $(DEPEND_FILES)
 	#java -jar $(PLANTUML) -config $(CONFIG) $<
