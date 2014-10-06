@@ -19,3 +19,8 @@ Another function does not work yet.
 * server
     * Python source code working on Raspberry Pi.
     * Raspberry Pi will work as server to gather the all information sent by all node.
+
+# Sequence flow
+
+* Initialization and termination
+    ![initialize and terminate sequence flow](https://github.com/dodo5522/home-automation/blob/master/documents/uml/sequence_init_term.png)
