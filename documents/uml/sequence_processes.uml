@@ -2,10 +2,10 @@
 title Sequence flow diagram between all process
 hide footbox
 
-participant "ServerProcess" as Server
-participant "ReceiverProcess" as Receiver
-participant "VegetablesMonitorProcess" as VegetablesMonitor
-participant "SolarPowerMonitorProcess" as SolarPowerMonitor
+participant "Server" as Server
+participant "Receiver" as Receiver
+participant "VegetablesMonitor" as VegetablesMonitor
+participant "SolarPowerMonitor" as SolarPowerMonitor
 
 create Receiver
 Server -> Receiver : Receiver.start()
