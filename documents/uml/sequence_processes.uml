@@ -3,13 +3,30 @@ title Sequence flow diagram between all process
 hide footbox
 
 participant "ServerProcess" as Server
+participant "ReceiverProcess" as Receiver
 participant "VegetablesMonitorProcess" as VegetablesMonitor
 participant "SolarPowerMonitorProcess" as SolarPowerMonitor
 
-Server -> VegetablesMonitor
-Server <-- VegetablesMonitor
+create Receiver
+Server -> Receiver : Receiver.start()
+note left
+	Create receiver process
+	against a coordinator
+	mounted on server side
+end note
 
-Server -> SolarPowerMonitor
-Server <-- SolarPowerMonitor
+activate Receiver
+	create VegetablesMonitor
+	Receiver -> VegetablesMonitor : VegetablesMonitor.start()
+	create SolarPowerMonitor
+	Receiver -> SolarPowerMonitor : VegetablesMonitor.start()
+deactivate Receiver
+
+Server -> Server : Wait all reveiver joined
+
+activate Server
+	Server <- Receiver : Join
+deactivate Server
+destroy Server
 @enduml
 
