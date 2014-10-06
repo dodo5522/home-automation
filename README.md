@@ -22,5 +22,6 @@ Another function does not work yet.
 
 # Sequence flow
 
-* Initialization and termination
+* server
+    * Initialization and termination  
     ![initialize and terminate sequence flow](https://github.com/dodo5522/home-automation/blob/master/documents/uml/sequence_init_term.png)
