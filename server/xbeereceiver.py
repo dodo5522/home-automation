@@ -8,8 +8,6 @@
 
 import logging
 import struct
-import serial
-from xbee import ZigBee
 
 class XBeeApiFrameBaseParser(object):
     '''
@@ -69,9 +67,9 @@ class XBeeApiFrameBaseParser(object):
         self._logger.info('rf_data: %s'.format(api_frame['rf_data']))
         return api_frame['rf_data']
 
-class XBeeApiFrameParser(XBeeApiFrameBaseParser):
+class XBeeApiRfDataParser(XBeeApiFrameBaseParser):
     '''
-    This class translate the API frame to node information and sensor data.
+    This class translate the API frame to sensor data.
     '''
     def __init__(self, sensors=0, log_level=logging.INFO):
         '''
@@ -81,13 +79,13 @@ class XBeeApiFrameParser(XBeeApiFrameBaseParser):
         self._logger = logging.getLogger(type(self).__name__)
         self._logger.setLevel(log_level)
 
-    def get_sensed_info(self, api_frame):
+    def get_senser_data(self, api_frame):
         '''
         Parse and return the information from sensors mounted on XBee module.
         '''
         rf_data_format = ['4sl' for i in range(0, self._sensors)]
         rf_data_format = ''.join(rf_data_format)
-        rf_data = struct.unpack(rf_data_format, api_frame['rf_data'])
+        rf_data = struct.unpack(rf_data_format, self.get_rf_data(api_frame))
 
         sensor_info = {}
         for rf_word_num in range(0, self._sensors):
@@ -101,30 +99,4 @@ class XBeeApiFrameParser(XBeeApiFrameBaseParser):
             self._logger.info('TYPE,VAL: %s,%f'.format(sensor_type, sensor_value))
 
         return sensor_info
-
-class XBeeReceiver(XBeeApiFrameBaseParser):
-    '''
-    Class with functions to communicate with XBee ZB.
-    There should be only one instance against one XBee coordinator.
-    '''
-
-    def __init__(self, port='/dev/ttyAMA0', baurate=9600, log_level=logging.INFO):
-        '''
-        Initialize XBee instance with serial port and baurate.
-        The baurate should be set to same value with XBee module.
-        '''
-        self._logger = logging.getLogger(type(self).__name__)
-        self._logger.setLevel(log_level)
-
-        self._port = port
-        self._baurate = baurate
-        ser = serial.Serial(self._port, self._baurate)
-        self._xbee = ZigBee(ser, escaped=True)
-
-    def wait_for_api_frame(self):
-        '''
-        Wait for API frame from XBee module.
-        And return the node information (source address etc.) and another data.
-        '''
-        return self._xbee.wait_read_frame()
 
