@@ -9,30 +9,23 @@
 import time
 import multiprocessing
 import logging
-import xbeereceiver
-import basemonitor
+import monitor
 
 class VegetablesPlanterMonitor(
         multiprocessing.Process,
-        xbeereceiver.XBeeApiRfDataParser,
-        basemonitor.BaseMonitor):
+        monitor.BaseMonitor):
     '''
     This class monitors gardening status with XBee.
     And put the information to Xively.
     '''
-    def __init__(self, source_addr_long=None,\
+    def __init__(self, monitoring_address=None,\
             xively_api_key=None, xively_feed_id=None,\
             log_level=logging.INFO):
         '''
         Initialize process etc.
         '''
         multiprocessing.Process.__init__(self, name=type(self).__name__)
-
-        basemonitor.BaseMonitor(self,
-                source_addr_long=source_addr_long,
-                xively_api_key=xively_api_key,
-                xively_feed_id=xively_feed_id,
-                log_level=log_level)
+        monitor.BaseMonitor(self, monitoring_address, xively_api_key, xively_feed_id, log_level)
 
     def run(self):
         '''

@@ -47,7 +47,7 @@ class ReceiverProcess(multiprocessing.Process):
             try:
                 api_frame = self._xbee.wait_read_frame()
                 for monitor in self._monitors:
-                    monitor.parse(api_frame)
+                    monitor.post_data(api_frame)
             except Exception as err:
                 print('{0} occurs.'.format(err))
                 continue
@@ -79,7 +79,7 @@ if __name__ == '__main__':
 
     monitors = []
     monitors.append(gardening.VegetablesPlanterMonitor(
-        source_addr_long=0x0013a20040b44f84,
+        monitoring_address=0x0013a20040b44f84,
         xively_api_key='h22...',
         xively_feed_id=1779591762))
     #monitors.append(powerplant.SolarPowerMonitor(
