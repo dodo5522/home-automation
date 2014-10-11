@@ -10,3 +10,6 @@
 [submodule "nodes/libraries/Adafruit_INA219"]
 	path = nodes/libraries/Adafruit_INA219
 	url = https://github.com/adafruit/Adafruit_INA219.git
+[submodule "nodes/libraries/INA226"]
+	path = nodes/libraries/INA226
+	url = https://github.com/jarzebski/Arduino-INA226
