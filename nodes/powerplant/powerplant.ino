@@ -129,13 +129,13 @@ void loop(void)
     led_on = !led_on;
 
     Serial.println("battery:");
-    Serial.print("shu mA: ");Serial.println(g_ina_battery.readShuntCurrent());
+    Serial.print("shu A: ");Serial.println(g_ina_battery.readShuntCurrent());
     Serial.print("shu V: "); Serial.println(g_ina_battery.readShuntVoltage());
     Serial.print("bus P: "); Serial.println(g_ina_battery.readBusPower());
     Serial.print("bus V: "); Serial.println(g_ina_battery.readBusVoltage());
 
     Serial.println("solar:");
-    Serial.print("shu mA: ");Serial.println(g_ina_solar.readShuntCurrent());
+    Serial.print("shu A: ");Serial.println(g_ina_solar.readShuntCurrent());
     Serial.print("shu V: "); Serial.println(g_ina_solar.readShuntVoltage());
     Serial.print("bus P: "); Serial.println(g_ina_solar.readBusPower());
     Serial.print("bus V: "); Serial.println(g_ina_solar.readBusVoltage());
