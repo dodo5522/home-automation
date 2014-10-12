@@ -8,9 +8,19 @@
 #include <INA226.h>
 #include <Adafruit_INA219.h>
 
+//#define INA226_ADDRESS              (0x40)
+#define INA226_11_ADDRESS           (0x45)
+#define INA226_DD_ADDRESS           (0x4a)
+#define INA226_CC_ADDRESS           (0x4f)
+
+//#define INA219_ADDRESS              (0x40)
+#define INA219_A0_ADDRESS           (0x41)
+#define INA219_A1_ADDRESS           (0x44)
+#define INA219_A0A1_ADDRESS         (0x45)
+
 static INA226 g_ina_solar;
 static INA226 g_ina_battery;
-static Adafruit_INA219 g_ina_converter(0x45);
+static Adafruit_INA219 g_ina_converter(INA219_A0A1_ADDRESS);
 
 void checkConfig(INA226 ina)
 {
@@ -94,8 +104,8 @@ void setup(void)
     digitalWrite(9, LOW);
 
     g_ina_converter.begin();
-    g_ina_battery.begin(0x4f);
-    g_ina_solar.begin(0x4a);
+    g_ina_battery.begin(INA226_CC_ADDRESS);
+    g_ina_solar.begin(INA226_DD_ADDRESS);
 
     // Configure INA226
     g_ina_battery.configure(
