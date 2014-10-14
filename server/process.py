@@ -9,10 +9,11 @@ import multiprocessing
 import logging
 
 class BaseProcess(multiprocessing.Process):
-    '''Base class to generate process.
+    '''Base class to generate process with conmunication by queue messaging.
     '''
     def __init__(self, log_level=None):
         '''Initialize process.
+           Queue message id 0 is reserved by termination of process.
         '''
         self._logger = logging.getLogger(type(self).__name__)
         self._logger.setLevel(log_level)
@@ -29,7 +30,7 @@ class BaseProcess(multiprocessing.Process):
         '''
         while True:
             item = self._message_queue.get()
-            self._logger.debug('got message id {0}.'.format(item[0]))
+            self._logger.debug('got message queue with id {0}.'.format(item[0]))
 
             func = self._message_table[item[0]]
             if item[1] is None:
@@ -53,29 +54,30 @@ class BaseProcess(multiprocessing.Process):
         raise NotImplementedError
 
 if __name__ == '__main__':
-    import time
+    logging.basicConfig(level=logging.DEBUG)
 
+    import time
     class TestChildProcess1(BaseProcess):
         def terminate(self):
             self._message_queue.put_nowait((0, 10))
-            print('{0}: sleep 10 terminate message is posted.'.format(self.name))
+            logging.debug('{0}: sleep 10 terminate message is posted.'.format(self.name))
 
         def _do_terminate(self, wait):
             for i in range(0, wait):
-                print('{0}: terminating.'.format(self.name))
+                logging.debug('{0}: terminating.'.format(self.name))
                 time.sleep(1)
-            print('{0}: terminated.'.format(self.name))
+            logging.debug('{0}: terminated.'.format(self.name))
 
     class TestChildProcess2(BaseProcess):
         def terminate(self):
             self._message_queue.put_nowait((0, 5))
-            print('{0}: sleep 5 terminate message is posted.'.format(self.name))
+            logging.debug('{0}: sleep 5 terminate message is posted.'.format(self.name))
 
         def _do_terminate(self, wait):
             for i in range(0, wait):
-                print('{0}: terminating.'.format(self.name))
+                logging.debug('{0}: terminating.'.format(self.name))
                 time.sleep(1)
-            print('{0}: terminated.'.format(self.name))
+            logging.debug('{0}: terminated.'.format(self.name))
 
     p = []
     p.append(TestChildProcess1(log_level=logging.DEBUG))
