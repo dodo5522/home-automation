@@ -9,7 +9,7 @@
 import time
 import multiprocessing
 import logging
-import monitor
+from base_modules import monitor
 
 class VegetablesPlanterMonitor(
         multiprocessing.Process,
