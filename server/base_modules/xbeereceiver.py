@@ -9,8 +9,11 @@ import multiprocessing
 import serial
 import logging
 from xbee import ZigBee
+from base_modules import XBeeApiFrameBaseParser
 
-class ReceiverProcess(multiprocessing.Process):
+class ReceiverProcess(\
+        multiprocessing.Process,\
+        XBeeApiFrameBaseParser):
     '''
     Base class of process to receive data from XBee ZB.
     There should be only one instance against one XBee coordinator.
@@ -39,14 +42,21 @@ class ReceiverProcess(multiprocessing.Process):
         while True:
             try:
                 api_frame = self._xbee.wait_read_frame()
-                for monitor in self._monitors:
+
+                #FIXME: monitor can return or has address
+                if self.get_source_addr_long(api_frame) in self._monitors:
                     monitor.post_data(api_frame)
+
             except Exception as err:
                 print('{0} occurs.'.format(err))
                 continue
 
+    def terminate(self):
+        '''Terminate this process and wait all monitor process joined.
+        '''
         for monitor in self._monitors:
-            monitor.join()
+            monitor.terminate()
+            monitor.join(30)
 
         # halt() must be called before closing the serial
         # port in order to ensure proper thread shutdown

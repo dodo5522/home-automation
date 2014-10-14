@@ -6,38 +6,71 @@
  Version    : 1.0
 """
 
-import time
-import multiprocessing
+import xively
+import datetime
 import logging
-from base_modules import monitor
+from base_modules import process
+from base_modules import xbeeparser
 
-class VegetablesPlanterMonitor(
-        multiprocessing.Process,
-        monitor.BaseMonitor):
+class VegetablesPlanterMonitor(\
+        process.BaseProcess,
+        xbeeparser.XBeeApiRfDataParser):
     '''
     This class monitors gardening status with XBee.
     And put the information to Xively.
     '''
-    def __init__(self, monitoring_address=None,\
-            xively_api_key=None, xively_feed_id=None,\
-            log_level=logging.INFO):
+
+    _XIVELY_ID_TABLE = \
+    {
+        'LUX0':'Luminosity',
+        'HUM0':'Humidity',
+        'MOI0':'MoistureOfSmallPlant',
+        'MOI1':'MoistureOfLargePlant',
+        'TMP0':'Temperature',
+    }
+
+    def __init__(self, monitoring_address, xively_api_key, xively_feed_id, log_level=logging.INFO):
         '''
         Initialize process etc.
         '''
-        multiprocessing.Process.__init__(self, name=type(self).__name__)
-        monitor.BaseMonitor(self, monitoring_address, xively_api_key, xively_feed_id, log_level)
+        process.BaseProcess.__init__(self, log_level=log_level)
 
-    def run(self):
+        self._monitoring_address = monitoring_address
+
+        api = xively.XivelyAPIClient(xively_api_key)
+        self._xively_feed = api.feeds.get(xively_feed_id)
+
+        self._message_table[1] = self._do_post_data
+
+    def _do_terminate(self):
+        '''Terminate procedure internally.
         '''
-        Method to be run in sub-process; can be overridden in sub-class
+        pass
+
+    def parse(self, api_frame):
         '''
-        while True:
-            try:
-                pass
-            except KeyboardInterrupt:
-                break
-            except Exception as err:
-                print('{0} occurs.'.format(err))
-                time.sleep(600)
-                continue
+        Parse api frame.
+        '''
+        if self.get_source_addr_long(api_frame) != self._monitoring_address:
+            return None
+        else:
+            return self.get_senser_data(api_frame)
+
+    def post_data(self, sensor_type, sensor_value):
+        #FIXME: not implemented yet.
+        raise NotImplementedError
+
+    def _do_post_data(self, sensor_type, sensor_value):
+        '''
+        Post sensor data to Xively service.
+        '''
+        now = datetime.datetime.utcnow()
+        self._logger.info(now)
+
+        #FIXME: data structure is not matched to the one of xbee node.
+        datastreams = []
+        for sensor_info in VegetablesPlanterMonitor._XIVELY_ID_TABLE:
+            datastreams.append(xively.Datastream(id=sensor_info[sensor_type], current_value=sensor_value, at=now))
+        self._xively_feed.datastreams = datastreams
+        self._xively_feed.update()
 

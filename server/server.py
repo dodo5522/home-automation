@@ -31,13 +31,13 @@ if __name__ == '__main__':
 
     monitors = []
     monitors.append(gardening.VegetablesPlanterMonitor(
-        monitoring_address=0x0013a20040b44f84,
-        xively_api_key='h22...',
-        xively_feed_id=1779591762))
+        0x0013a20040b44f84,
+        'h22...',
+        1779591762))
     #monitors.append(powerplant.SolarPowerMonitor(
-    #    source_addr_long=0x0013a20040afbcce,
-    #    xively_api_key=,
-    #    xively_feed_id=))
+    #    0x0013a20040afbcce,
+    #    ,
+    #    ))
 
     logger.info('monitor process objects have been generated.')
 
@@ -64,7 +64,8 @@ if __name__ == '__main__':
             logger.info('another exception?')
             continue
 
-    for process in receivers:
-        process.join()
-        logger.info('{PROCESS} is joined.'.format(PROCESS=process))
+    for receiver in receivers:
+        receiver.terminate()
+        receiver.join(30)
+        logger.info('{PROCESS} is joined.'.format(PROCESS=receiver))
 
