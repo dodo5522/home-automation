@@ -59,13 +59,9 @@ if __name__ == '__main__':
             time.sleep(10)
         except KeyboardInterrupt:
             break
-        else:
-            #FIXME: check this implementation.
-            logger.info('another exception?')
-            continue
 
     for receiver in receivers:
-        receiver.terminate()
+        receiver.post_terminate()
         receiver.join(30)
         logger.info('{PROCESS} is joined.'.format(PROCESS=receiver))
 
