@@ -11,6 +11,8 @@ import logging
 class BaseProcess(multiprocessing.Process):
     '''Base class to generate process with conmunication by queue messaging.
     '''
+    QUEUE_ID_TERMINATE = 0
+
     def __init__(self, log_level=None):
         '''Initialize process.
            Queue message id 0 is reserved by termination of process.
@@ -23,33 +25,41 @@ class BaseProcess(multiprocessing.Process):
         self._message_queue = multiprocessing.Queue()
 
         self._message_table = {}
-        self._message_table[0] = self._do_terminate
+        self._message_table[BaseProcess.QUEUE_ID_TERMINATE] = self._do_terminate
 
     def run(self):
         '''Parse message queue.
         '''
         while True:
             item = self._message_queue.get()
-            self._logger.debug('got message queue with id {0}.'.format(item[0]))
 
-            func = self._message_table[item[0]]
-            if item[1] is None:
+            queue_id = item[0]
+            queue_args = item[1]
+            func = self._message_table[queue_id]
+
+            self._logger.debug('got message with id {0} with args {1}.'.format(queue_id, queue_args))
+
+            if queue_args is None:
                 func()
             else:
-                func(item[1])
+                func(queue_args)
 
-            # id 0 means termination.
-            if item[0] == 0:
+            if queue_id == BaseProcess.QUEUE_ID_TERMINATE:
                 break
 
-    def terminate(self):
+    def post_queue(self, queue_id, queue_args=None):
+        '''Post message to message handler.
+        '''
+        self._message_queue.put_nowait((queue_id, queue_args))
+
+    def post_terminate(self):
         '''Post message to terminate this process.
            You shoul wait for joined with join() method.
         '''
-        self._message_queue.put_nowait((0, None))
+        self.post_queue(BaseProcess.QUEUE_ID_TERMINATE)
 
     def _do_terminate(self):
-        '''Terminate procedure should be implemented.
+        '''Terminate procedure should be implemented by ingerited class.
         '''
-        raise NotImplementedError
+        pass
 

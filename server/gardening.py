@@ -42,11 +42,6 @@ class VegetablesPlanterMonitor(\
 
         self._message_table[1] = self._do_post_data
 
-    def _do_terminate(self):
-        '''Terminate procedure internally.
-        '''
-        pass
-
     def parse(self, api_frame):
         '''
         Parse api frame.

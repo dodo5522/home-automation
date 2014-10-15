@@ -12,8 +12,8 @@ if __name__ == '__main__':
 
     import time
     class TestChildProcess1(BaseProcess):
-        def terminate(self):
-            self._message_queue.put_nowait((0, 10))
+        def post_terminate(self):
+            self._message_queue.put_nowait((BaseProcess.QUEUE_ID_TERMINATE, 10))
             logging.debug('{0}: sleep 10 terminate message is posted.'.format(self.name))
 
         def _do_terminate(self, wait):
@@ -23,8 +23,8 @@ if __name__ == '__main__':
             logging.debug('{0}: terminated.'.format(self.name))
 
     class TestChildProcess2(BaseProcess):
-        def terminate(self):
-            self._message_queue.put_nowait((0, 5))
+        def post_terminate(self):
+            self._message_queue.put_nowait((BaseProcess.QUEUE_ID_TERMINATE, 5))
             logging.debug('{0}: sleep 5 terminate message is posted.'.format(self.name))
 
         def _do_terminate(self, wait):
@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     # post terminate message to all process
     for process in p:
-        process.terminate()
+        process.post_terminate()
 
     for process in p:
         process.join()
