@@ -5,7 +5,6 @@
  Editor     : Takashi Ando
  Version    : 1.0
 """
-import threading
 import serial
 import logging
 from xbee import ZigBee
@@ -29,47 +28,39 @@ class ReceiverProcess(\
         process.BaseProcess.__init__(self, log_level=log_level)
         xbeeparser.XBeeApiFrameBaseParser.__init__(self, log_level=log_level)
 
-        self._port = port
-        self._baurate = baurate
-        self._ser = serial.Serial(self._port, self._baurate)
-        self._xbee = ZigBee(self._ser, escaped=True)
-
         self._monitors = monitors
         for monitor in self._monitors:
             monitor.start()
 
-        self._thread_receive = threading.Thread(target=self._receive_frame)
-        self._thread_receive.start()
+        self._port = port
+        self._baurate = baurate
+        self._ser = serial.Serial(self._port, self._baurate)
+        self._xbee = ZigBee(self._ser, escaped=True, callback=self._receive_frame)
 
-    def _receive_frame(self):
-        '''Wait for API frame from XBee module.
-           And return the node information (source address etc.) and another data.
+    def _receive_frame(self, api_frame):
         '''
-        while True:
-            api_frame = self._xbee.wait_read_frame()
-            self._logger.debug(api_frame)
+        _receive_frame: XBee API frame dictionary -> None
 
-            #TODO: unefficient way to search...
-            for monitor in self._monitors:
-                addr = self.get_source_addr_long(api_frame)
-                if addr == monitor.get_monitoring_address():
-                    monitor.post_data(api_frame)
+        Callback to receive API frame from XBee module.
+        And if the API frame has monitoring address, pass the frame to the monitor instance.
+        '''
+        self._logger.debug(api_frame)
 
-        self._logger.debug('thread to receive is done.')
+        #TODO: unefficient way to search...
+        for monitor in self._monitors:
+            addr = self.get_source_addr_long(api_frame)
+            if addr == monitor.get_monitoring_address():
+                monitor.post_data(api_frame)
 
     def _do_terminate(self):
         '''Wait and join all thread and process.
         '''
+        # halt() must be called before closing the serial
+        # port in order to ensure proper thread shutdown
         self._xbee.halt()
-        self._thread_receive.join(30)
+        self._ser.close()
 
         for monitor in self._monitors:
             monitor.post_terminate()
             monitor.join(30)
-
-        # halt() must be called before closing the serial
-        # port in order to ensure proper thread shutdown
-        if self._xbee is not None:
-            self._xbee.halt()
-        self._ser.close()
 
