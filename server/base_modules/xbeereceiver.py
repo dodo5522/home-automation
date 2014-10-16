@@ -49,9 +49,11 @@ class ReceiverProcess(\
             api_frame = self._xbee.wait_read_frame()
             self._logger.debug(api_frame)
 
-            #FIXME: monitor can return or has address
-            #if self.get_source_addr_long(api_frame) in self._monitors:
-            #    monitor.post_data(api_frame)
+            #TODO: unefficient way to search...
+            for monitor in self._monitors:
+                addr = self.get_source_addr_long(api_frame)
+                if addr == monitor.get_monitoring_address():
+                    monitor.post_data(api_frame)
 
         self._logger.debug('thread to receive is done.')
 

@@ -42,6 +42,14 @@ class VegetablesPlanterMonitor(\
 
         self._message_table[1] = self._do_post_data
 
+    def get_monitoring_address(self):
+        '''
+        get_monitoring_address: None -> int
+
+        Get XBee 64bit source address to monitor in this instance.
+        '''
+        return self._monitoring_address
+
     def parse(self, api_frame):
         '''
         Parse api frame.
