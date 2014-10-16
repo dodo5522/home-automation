@@ -58,8 +58,8 @@ class ReceiverProcess(\
     def _do_terminate(self):
         '''Wait and join all thread and process.
         '''
-        #FIXME: terminate thread is needed.
-        #self._thread_receive.join(30)
+        self._xbee.halt()
+        self._thread_receive.join(30)
 
         for monitor in self._monitors:
             monitor.post_terminate()
