@@ -50,7 +50,7 @@ class ReceiverProcess(\
         for monitor in self._monitors:
             addr = self.get_source_addr_long(api_frame)
             if addr == monitor.get_monitoring_address():
-                monitor.post_data(api_frame)
+                monitor.post_data_to_service(api_frame)
 
     def _do_terminate(self):
         '''Wait and join all thread and process.

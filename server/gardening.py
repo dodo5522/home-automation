@@ -34,13 +34,14 @@ class VegetablesPlanterMonitor(\
         Initialize process etc.
         '''
         process.BaseProcess.__init__(self, log_level=log_level)
+        xbeeparser.XBeeApiRfDataParser(self, sensors=len(VegetablesPlanterMonitor._XIVELY_ID_TABLE), log_level=log_level)
 
         self._monitoring_address = monitoring_address
 
         api = xively.XivelyAPIClient(xively_api_key)
         self._xively_feed = api.feeds.get(xively_feed_id)
 
-        self._message_table[1] = self._do_post_data
+        self._message_table[1] = self._do_post_data_to_service
 
     def get_monitoring_address(self):
         '''
@@ -50,30 +51,33 @@ class VegetablesPlanterMonitor(\
         '''
         return self._monitoring_address
 
-    def parse(self, api_frame):
+    def post_data_to_service(self, api_frame):
         '''
-        Parse api frame.
-        '''
-        if self.get_source_addr_long(api_frame) != self._monitoring_address:
-            return None
-        else:
-            return self.get_senser_data(api_frame)
+        post_data_to_service: XBee API frame dictionary -> None
 
-    def post_data(self, sensor_type, sensor_value):
-        #FIXME: not implemented yet.
-        raise NotImplementedError
+        Post monitored data to this instance's message handler
+        to parse and send it to some services like Xively etc.
+        '''
+        self.post_queue(1, api_frame)
 
-    def _do_post_data(self, sensor_type, sensor_value):
+    def _do_post_data_to_service(self, api_frame):
         '''
-        Post sensor data to Xively service.
+        _do_post_data_to_service: XBee API frame dictionary -> None
+
+        Parse and send data to some services like Xively etc.
         '''
+        got_sensor_info = self.get_senser_data(api_frame)
+
         now = datetime.datetime.utcnow()
         self._logger.info(now)
 
-        #FIXME: data structure is not matched to the one of xbee node.
         datastreams = []
-        for sensor_info in VegetablesPlanterMonitor._XIVELY_ID_TABLE:
-            datastreams.append(xively.Datastream(id=sensor_info[sensor_type], current_value=sensor_value, at=now))
+        for sensor_type in got_sensor_info:
+            sensor_value = got_sensor_info[sensor_type]
+            datastreams.append(xively.Datastream(
+                id=VegetablesPlanterMonitor._XIVELY_ID_TABLE[sensor_type],
+                current_value=sensor_value, at=now))
+
         self._xively_feed.datastreams = datastreams
         self._xively_feed.update()
 
