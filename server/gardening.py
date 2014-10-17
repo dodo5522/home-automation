@@ -34,7 +34,9 @@ class VegetablesPlanterMonitor(\
         Initialize process etc.
         '''
         process.BaseProcess.__init__(self, log_level=log_level)
-        xbeeparser.XBeeApiRfDataParser(self, sensors=len(VegetablesPlanterMonitor._XIVELY_ID_TABLE), log_level=log_level)
+        xbeeparser.XBeeApiRfDataParser.__init__(self, \
+                sensors=len(VegetablesPlanterMonitor._XIVELY_ID_TABLE), \
+                log_level=log_level)
 
         self._monitoring_address = monitoring_address
 

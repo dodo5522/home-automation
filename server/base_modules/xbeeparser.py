@@ -76,8 +76,7 @@ class XBeeApiRfDataParser(XBeeApiFrameBaseParser):
         This parser should be initialized with the number of mounted sensors.
         '''
         self._sensors = sensors
-        self._logger = logging.getLogger(type(self).__name__)
-        self._logger.setLevel(log_level)
+        XBeeApiFrameBaseParser.__init__(self, log_level=log_level)
 
     def get_senser_data(self, api_frame):
         '''
