@@ -44,10 +44,20 @@ activate Receiver
     deactivate SolarPowerMonitor
 
     Receiver -> VegetablesMonitor : VegetablesMonitor.start()
-    Receiver <-- VegetablesMonitor
+    activate VegetablesMonitor
+        VegetablesMonitor -> VegetablesMonitor : run as process
+        activate VegetablesMonitor
+        deactivate VegetablesMonitor
+        Receiver <-- VegetablesMonitor
+    deactivate VegetablesMonitor
 
     Receiver -> SolarPowerMonitor : SolarPowerMonitor.start()
-    Receiver <-- SolarPowerMonitor
+    activate SolarPowerMonitor
+        SolarPowerMonitor -> SolarPowerMonitor : run as process
+        activate SolarPowerMonitor
+        deactivate SolarPowerMonitor
+        Receiver <-- SolarPowerMonitor
+    deactivate SolarPowerMonitor
 deactivate Receiver
 
 == Termination ==
