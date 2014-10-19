@@ -9,76 +9,78 @@ hide footbox
 create Receiver
 Server -> Receiver : Receiver.init()
 note left
-	Create receiver process
-	against a coordinator
-	mounted on server side
+    Create receiver process
+    against a coordinator
+    mounted on server side
 end note
 
 Server -> Receiver : Receiver.start()
 activate Receiver
-	create VegetablesMonitor
-	Receiver -> VegetablesMonitor : VegetablesMonitor.init()
+    create VegetablesMonitor
+    Receiver -> VegetablesMonitor : VegetablesMonitor.init()
+    activate VegetablesMonitor
+        VegetablesMonitor -> VegetablesMonitor : Run internal process
+        activate VegetablesMonitor
+            VegetablesMonitor ->] : Initialize xively module
+            VegetablesMonitor <--]
+            VegetablesMonitor ->] : Initialize motor driver
+            note left
+                ex. to supply water to planters
+            end note
+            VegetablesMonitor <--]
+        deactivate VegetablesMonitor
+        Receiver <-- VegetablesMonitor
+    deactivate VegetablesMonitor
 
-	create SolarPowerMonitor
-	Receiver -> SolarPowerMonitor : SolarPowerMonitor.init()
+    create SolarPowerMonitor
+    Receiver -> SolarPowerMonitor : SolarPowerMonitor.init()
+    activate SolarPowerMonitor
+        SolarPowerMonitor -> SolarPowerMonitor : Run internal process
+        activate SolarPowerMonitor
+            SolarPowerMonitor ->] : Initialize xively module
+            SolarPowerMonitor <--]
+        deactivate SolarPowerMonitor
+        Receiver <-- SolarPowerMonitor
+    deactivate SolarPowerMonitor
 
-	Receiver -> VegetablesMonitor : VegetablesMonitor.start()
-	activate VegetablesMonitor
-		VegetablesMonitor -> VegetablesMonitor : Run internal process
-		activate VegetablesMonitor
-			VegetablesMonitor ->] : Initialize xively module
-			VegetablesMonitor <--]
-			VegetablesMonitor ->] : Initialize motor driver
-			note left
-				ex. to supply water to planters
-			end note
-			VegetablesMonitor <--]
-		deactivate VegetablesMonitor
-		Receiver <-- VegetablesMonitor
-	deactivate VegetablesMonitor
+    Receiver -> VegetablesMonitor : VegetablesMonitor.start()
+    Receiver <-- VegetablesMonitor
 
-	Receiver -> SolarPowerMonitor : SolarPowerMonitor.start()
-	activate SolarPowerMonitor
-		SolarPowerMonitor -> SolarPowerMonitor : Run internal process
-		activate SolarPowerMonitor
-			SolarPowerMonitor ->] : Initialize xively module
-			SolarPowerMonitor <--]
-		deactivate SolarPowerMonitor
-		Receiver <-- SolarPowerMonitor
-	deactivate SolarPowerMonitor
+    Receiver -> SolarPowerMonitor : SolarPowerMonitor.start()
+    Receiver <-- SolarPowerMonitor
 deactivate Receiver
 
 == Termination ==
 
 Server ->> Receiver : Send message to terminate
 activate Receiver
-	Receiver ->> VegetablesMonitor : Send message to terminate
-	activate VegetablesMonitor
-		VegetablesMonitor -> VegetablesMonitor : Finish the internal process
-		activate VegetablesMonitor
-		deactivate VegetablesMonitor
-	deactivate VegetablesMonitor
-	destroy VegetablesMonitor
+    Receiver ->> VegetablesMonitor : Send message to terminate
+    activate VegetablesMonitor
+        VegetablesMonitor -> VegetablesMonitor : Finish the internal process
+        activate VegetablesMonitor
+        deactivate VegetablesMonitor
+    deactivate VegetablesMonitor
+    destroy VegetablesMonitor
 
-	Receiver ->> SolarPowerMonitor : Send message to terminate
-	activate SolarPowerMonitor
-		SolarPowerMonitor -> SolarPowerMonitor : Finish the internal process
-		activate SolarPowerMonitor
-		deactivate SolarPowerMonitor
-	deactivate SolarPowerMonitor
-	destroy SolarPowerMonitor
+    Receiver ->> SolarPowerMonitor : Send message to terminate
+    activate SolarPowerMonitor
+        SolarPowerMonitor -> SolarPowerMonitor : Finish the internal process
+        activate SolarPowerMonitor
+        deactivate SolarPowerMonitor
+    deactivate SolarPowerMonitor
+    destroy SolarPowerMonitor
 deactivate Receiver
 
 Receiver -> Receiver : Wait all monitor joined
 activate Receiver
-	Receiver <-- VegetablesMonitor : VegetablesMonitor.join()
-	Receiver <-- SolarPowerMonitor : SolarPowerMonitor.join()
+    Receiver <-- VegetablesMonitor : VegetablesMonitor.join()
+    Receiver <-- SolarPowerMonitor : SolarPowerMonitor.join()
 deactivate Receiver
 destroy Receiver
 
 Server -> Server : Wait all reveiver joined
 activate Server
-	Server <- Receiver : Receiver.join()
+    Server <- Receiver : Receiver.join()
 deactivate Server
 destroy Server
 @enduml

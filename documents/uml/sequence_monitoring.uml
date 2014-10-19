@@ -10,33 +10,33 @@ Receiver -> Receiver : Check if
 Receiver -> VegetablesMonitor : Check if process is alive
 
 activate Receiver
-	Receiver ->> VegetablesMonitor : Check if process is alive
-	activate VegetablesMonitor
-		VegetablesMonitor -> VegetablesMonitor : Finish the internal process
-		activate VegetablesMonitor
-		deactivate VegetablesMonitor
-	deactivate VegetablesMonitor
-	destroy VegetablesMonitor
+    Receiver ->> VegetablesMonitor : Check if process is alive
+    activate VegetablesMonitor
+        VegetablesMonitor -> VegetablesMonitor : Finish the internal process
+        activate VegetablesMonitor
+        deactivate VegetablesMonitor
+    deactivate VegetablesMonitor
+    destroy VegetablesMonitor
 
-	Receiver ->> SolarPowerMonitor : Send message to terminate
-	activate SolarPowerMonitor
-		SolarPowerMonitor -> SolarPowerMonitor : Finish the internal process
-		activate SolarPowerMonitor
-		deactivate SolarPowerMonitor
-	deactivate SolarPowerMonitor
-	destroy SolarPowerMonitor
+    Receiver ->> SolarPowerMonitor : Send message to terminate
+    activate SolarPowerMonitor
+        SolarPowerMonitor -> SolarPowerMonitor : Finish the internal process
+        activate SolarPowerMonitor
+        deactivate SolarPowerMonitor
+    deactivate SolarPowerMonitor
+    destroy SolarPowerMonitor
 deactivate Receiver
 
 Receiver -> Receiver : Wait all monitor joined
 activate Receiver
-	Receiver <-- VegetablesMonitor : VegetablesMonitor.join()
-	Receiver <-- SolarPowerMonitor : SolarPowerMonitor.join()
+    Receiver <-- VegetablesMonitor : VegetablesMonitor.join()
+    Receiver <-- SolarPowerMonitor : SolarPowerMonitor.join()
 deactivate Receiver
 destroy Receiver
 
 Server -> Server : Wait all reveiver joined
 activate Server
-	Server <- Receiver : Receiver.join()
+    Server <- Receiver : Receiver.join()
 deactivate Server
 destroy Server
 @enduml
