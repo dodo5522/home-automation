@@ -18,15 +18,18 @@ endef
 
 all:seq class
 
-.PHONY:seq seq_init seq_monitor
+.PHONY:seq seq_init seq_monitor seq_alive
 
-seq:seq_init seq_monitor
+seq:seq_init seq_monitor seq_alive
 	@echo $@ done.
 
 seq_init:sequence_init_term.png
 	$(call SHOW_IMAGE,$<)
 
 seq_monitor:sequence_monitoring.png
+	$(call SHOW_IMAGE,$<)
+
+seq_alive:sequence_check_alive.png
 	$(call SHOW_IMAGE,$<)
 
 %.png:%.uml $(DEPEND_FILES)

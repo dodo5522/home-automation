@@ -1,0 +1,64 @@
+@startuml
+'title Sequence flow diagram to check if all process is alive
+hide footbox
+
+!include sequence_common.uml
+
+Server ->> Receiver : Send message to check \nif all Receiver is alive
+activate Receiver
+    Receiver -> VegetablesMonitor : Check if process is alive
+    alt process is not alive
+        Receiver <- VegetablesMonitor : join
+        Receiver -> VegetablesMonitor : VegetablesMonitor.init()
+        activate VegetablesMonitor
+            Receiver <-- VegetablesMonitor
+        deactivate VegetablesMonitor
+        Receiver -> VegetablesMonitor : VegetablesMonitor.start()
+        activate VegetablesMonitor
+            Receiver <-- VegetablesMonitor
+        deactivate VegetablesMonitor
+    end
+
+    Receiver -> SolarPowerMonitor : Check if process is alive
+    alt process is not alive
+        Receiver <- SolarPowerMonitor : join
+        Receiver -> SolarPowerMonitor : SolarPowerMonitor.init()
+        activate SolarPowerMonitor
+            Receiver <-- SolarPowerMonitor
+        deactivate SolarPowerMonitor
+        Receiver -> SolarPowerMonitor : SolarPowerMonitor.start()
+        activate SolarPowerMonitor
+            Receiver <-- SolarPowerMonitor
+        deactivate SolarPowerMonitor
+    end
+    Server -> Server : Wait for response from Receiver \nwith timeout 30s
+    activate Server
+    deactivate Server
+    Server <<-- Receiver
+deactivate Receiver
+
+alt response from Receiver is timeout
+    Server -> Server
+    activate Server
+        Server -> Receiver : Check if process is alive
+        alt Receiver process is alive
+            Server -> SolarPowerMonitor : Terminate due to full Queue
+            Server -> VegetablesMonitor
+            Server -> Receiver
+            Server -> Server : Kill myself
+            activate Server
+            deactivate Server
+        else Receiver process is dead
+            Server <- Receiver : join
+            Server -> Receiver : Receiver.init()
+            activate Receiver
+                Server <-- Receiver
+            deactivate Receiver
+            Server -> Receiver : Receiver.start()
+            activate Receiver
+                Server <-- Receiver
+            deactivate Receiver
+        end
+    deactivate Server
+end
+@enduml
