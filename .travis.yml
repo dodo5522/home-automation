@@ -1,6 +1,6 @@
 language: python
 python:
     - "3.2"
-install: 
+install:
     - "pip install -r server/requirements.txt"
 script: ./server/test.py
