@@ -4,40 +4,23 @@ hide footbox
 
 !include sequence_common.uml
 
-Server -> Receiver : Check if all Receiver is alive
-
-Receiver -> Receiver : Check if 
-Receiver -> VegetablesMonitor : Check if process is alive
-
+Receiver <<-] : Receive API frame packet\nfrom XBee node. 
 activate Receiver
-    Receiver ->> VegetablesMonitor : Check if process is alive
-    activate VegetablesMonitor
-        VegetablesMonitor -> VegetablesMonitor : Finish the internal process
+    alt API frame is from VegetablesMonitor node
+        Receiver ->> VegetablesMonitor : Send message to pass the frame
         activate VegetablesMonitor
+            VegetablesMonitor -> VegetablesMonitor
+            activate VegetablesMonitor
+            deactivate VegetablesMonitor
         deactivate VegetablesMonitor
-    deactivate VegetablesMonitor
-    destroy VegetablesMonitor
-
-    Receiver ->> SolarPowerMonitor : Send message to terminate
-    activate SolarPowerMonitor
-        SolarPowerMonitor -> SolarPowerMonitor : Finish the internal process
+    else API frame is from SolarPowerMonitor node
+        Receiver ->> SolarPowerMonitor : Send message to pass the frame
         activate SolarPowerMonitor
+            SolarPowerMonitor -> SolarPowerMonitor
+            activate SolarPowerMonitor
+            deactivate SolarPowerMonitor
         deactivate SolarPowerMonitor
-    deactivate SolarPowerMonitor
-    destroy SolarPowerMonitor
+    end
 deactivate Receiver
-
-Receiver -> Receiver : Wait all monitor joined
-activate Receiver
-    Receiver <-- VegetablesMonitor : VegetablesMonitor.join()
-    Receiver <-- SolarPowerMonitor : SolarPowerMonitor.join()
-deactivate Receiver
-destroy Receiver
-
-Server -> Server : Wait all reveiver joined
-activate Server
-    Server <- Receiver : Receiver.join()
-deactivate Server
-destroy Server
 @enduml
 
