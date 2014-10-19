@@ -1,105 +1,85 @@
 #!/usr/bin/env python3
 
 """
- Example code for server side on raspberry pi for my gardening.
+ Server side code for my gardening.
  Editor     : Takashi Ando
  Version    : 1.0
 """
-from xbee import ZigBee
-from requests.exceptions import HTTPError
-import sys
-import datetime
-import struct
-import time
-import serial
+
 import xively
+import datetime
+import logging
+from base_modules import process
+from base_modules import xbeeparser
 
-_XBEE_PORT = '/dev/ttyAMA0'
-_XBEE_BAUDRATE = 9600
+class VegetablesPlanterMonitor(\
+        process.BaseProcess,
+        xbeeparser.XBeeApiRfDataParser):
+    '''
+    This class monitors gardening status with XBee.
+    And put the information to Xively.
+    '''
 
-_XIVELY_FEED_ID = 1779591762
-_XIVELY_ID_TABLE = \
-{
+    _XIVELY_ID_TABLE = \
+    {
         'LUX0':'Luminosity',
         'HUM0':'Humidity',
         'MOI0':'MoistureOfSmallPlant',
         'MOI1':'MoistureOfLargePlant',
         'TMP0':'Temperature',
-}
+    }
 
-def message_received(feed, data, now):
-    print(now)
+    def __init__(self, monitoring_address, xively_api_key, xively_feed_id, log_level=logging.INFO):
+        '''
+        Initialize process etc.
+        '''
+        process.BaseProcess.__init__(self, log_level=log_level)
+        xbeeparser.XBeeApiRfDataParser.__init__(self, \
+                sensors=len(VegetablesPlanterMonitor._XIVELY_ID_TABLE), \
+                log_level=log_level)
 
-    source_addr_long_raw = [byte for byte in struct.unpack('BBBBBBBB', data['source_addr_long'])]
+        self._monitoring_address = monitoring_address
 
-    source_addr_long_high = 0
-    for i in range(0,4):
-        source_addr_long_high |= source_addr_long_raw[i] << 8 * (3 - i)
-    print(hex(source_addr_long_high))
+        api = xively.XivelyAPIClient(xively_api_key)
+        self._xively_feed = api.feeds.get(xively_feed_id)
 
-    source_addr_long_low = 0
-    for i in range(4,8):
-        source_addr_long_low |= source_addr_long_raw[i] << 8 * (7 - i)
-    print(hex(source_addr_long_low))
-    
-    source_addr_raw = [byte for byte in struct.unpack('BB', data['source_addr'])]
+        self._message_table[1] = self._do_post_data_to_service
 
-    source_addr = 0
-    for i in range(0,2):
-        source_addr |= source_addr_raw[i] << 8 * (1 - i)
-    print(hex(source_addr))
+    def get_monitoring_address(self):
+        '''
+        get_monitoring_address: None -> int
 
-    #print(data['id'])
-    #print(data['options'])
+        Get XBee 64bit source address to monitor in this instance.
+        '''
+        return self._monitoring_address
 
-    rf_data = struct.unpack('4sl4sl4sl4sl4sl', data['rf_data'])
+    def post_data_to_service(self, api_frame):
+        '''
+        post_data_to_service: XBee API frame dictionary -> None
 
-    datastreams = []
-    for rf_word_num in range(0,5):
-        sensor_type  = rf_data[rf_word_num*2+0].decode('ascii')
-        sensor_value = rf_data[rf_word_num*2+1] / 10.0
-        print(sensor_type, sensor_value)
+        Post monitored data to this instance's message handler
+        to parse and send it to some services like Xively etc.
+        '''
+        self.post_queue(1, api_frame)
 
-        datastreams.append(xively.Datastream(id=_XIVELY_ID_TABLE[sensor_type], current_value=sensor_value, at=now))
+    def _do_post_data_to_service(self, api_frame):
+        '''
+        _do_post_data_to_service: XBee API frame dictionary -> None
 
-    feed.datastreams = datastreams
-    feed.update()
+        Parse and send data to some services like Xively etc.
+        '''
+        got_sensor_info = self.get_senser_data(api_frame)
 
-if __name__ == '__main__':
-    ser = serial.Serial(_XBEE_PORT, _XBEE_BAUDRATE)
-    
-    kargs = {}
-    kargs['escaped'] = True
-    #kargs['callback'] = message_received
-    
-    if len(sys.argv) > 1:
-        if 'debug' in sys.argv:
-            xbee = None
-        else:
-            xbee = ZigBee(ser, **kargs)
-            api = xively.XivelyAPIClient(sys.argv[1])
-            feed = api.feeds.get(_XIVELY_FEED_ID)
-    else:
-        raise SystemError('Xively API key is required.')
-    
-    # Do other stuff in the main thread
-    while True:
-        try:
-            if xbee is None:
-                ser.read()
-            else:
-                data = xbee.wait_read_frame()
-                now = datetime.datetime.utcnow()
-                message_received(feed, data, now)
-        except HTTPError:
-            print('HTTPError occurs.')
-            time.sleep(600)
-            continue
-        except KeyboardInterrupt:
-            break
-    
-    # halt() must be called before closing the serial
-    # port in order to ensure proper thread shutdown
-    if xbee is not None:
-        xbee.halt()
-    ser.close()
+        now = datetime.datetime.utcnow()
+        self._logger.info(now)
+
+        datastreams = []
+        for sensor_type in got_sensor_info:
+            sensor_value = got_sensor_info[sensor_type]
+            datastreams.append(xively.Datastream(
+                id=VegetablesPlanterMonitor._XIVELY_ID_TABLE[sensor_type],
+                current_value=sensor_value, at=now))
+
+        self._xively_feed.datastreams = datastreams
+        self._xively_feed.update()
+
