@@ -16,7 +16,7 @@ Another function does not work yet.
 * nodes
     * C/C++ source code working on Arduino.
     * All node will have Arduino and XBee.
-* server
+* server [![Build Status](https://travis-ci.org/dodo5522/home-automation.svg?branch=master)](https://travis-ci.org/dodo5522/home-automation)
     * Python source code working on Raspberry Pi.
     * Raspberry Pi will work as server to gather the all information sent by all node.
 
