@@ -28,7 +28,7 @@ class XBeeApiFrameBaseParser(object):
 
         src_addr = 0
         for i in range(0, 8):
-            self._logger.info('SRC[%d]: %s'.format(i, hex(src_addr_raw[i])))
+            self._logger.debug('src_addr[{0}]: {1}'.format(i, hex(src_addr_raw[i])))
             src_addr |= src_addr_raw[i] << 8 * (7 - i)
 
         return src_addr
@@ -41,7 +41,7 @@ class XBeeApiFrameBaseParser(object):
 
         net_addr = 0
         for i in range(0, 2):
-            self._logger.info('NET[%d]: %s'.format(i, hex(net_addr_raw[i])))
+            self._logger.debug('net_addr[{0}]: {1}'.format(i, hex(net_addr_raw[i])))
             net_addr |= net_addr_raw[i] << 8 * (1 - i)
 
         return net_addr
@@ -50,21 +50,21 @@ class XBeeApiFrameBaseParser(object):
         '''
         Parse and return 'id' value got from XBee node.
         '''
-        self._logger.info('ID: %s'.format(api_frame['id']))
+        self._logger.debug('id: {0}'.format(api_frame['id']))
         return api_frame['id']
 
     def get_options(self, api_frame):
         '''
         Parse and return 'options' value got from XBee node.
         '''
-        self._logger.info('OPT: %s'.format(api_frame['options']))
+        self._logger.debug('opt: {0}'.format(api_frame['options']))
         return api_frame['options']
 
     def get_rf_data(self, api_frame):
         '''
         Parse and return 'rf_data' value got from XBee node.
         '''
-        self._logger.info('rf_data: %s'.format(api_frame['rf_data']))
+        self._logger.debug('rf_data: {0}'.format(api_frame['rf_data']))
         return api_frame['rf_data']
 
 class XBeeApiRfDataParser(XBeeApiFrameBaseParser):
@@ -95,7 +95,7 @@ class XBeeApiRfDataParser(XBeeApiFrameBaseParser):
             sensor_value = rf_data_l / 10.0
 
             sensor_info[sensor_type] = sensor_value
-            self._logger.info('TYPE,VAL: %s,%f'.format(sensor_type, sensor_value))
+            self._logger.debug('type,value: {0},{1}'.format(sensor_type, sensor_value))
 
         return sensor_info
 
