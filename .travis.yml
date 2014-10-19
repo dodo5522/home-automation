@@ -1,6 +1,10 @@
 language: python
 python:
     - "3.2"
+env:
+    - BUILD_ENV=TravisCI
 install:
     - "pip install -r server/requirements.txt"
-script: ./server/test.py
+script:
+    - ./server/test.py
+    - make -C documents/uml
