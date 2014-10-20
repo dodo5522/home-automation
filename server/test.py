@@ -6,6 +6,7 @@ Unit test code
 import unittest
 import logging
 import datetime,time
+import server
 from base_modules.process import BaseProcess
 from base_modules.xbeereceiver import ReceiverProcess
 
@@ -82,6 +83,20 @@ class MyUnitTest(unittest.TestCase):
 
         for process in p:
             self.assertFalse(process.is_alive())
+
+    def test_init_args_default(self):
+        arg_parsed = server.init_args(args=[])
+        self.assertEqual(len(arg_parsed.ports), 1)
+        self.assertEqual(arg_parsed.ports[0], '/dev/ttyAMA0')
+        self.assertIsNone(arg_parsed.log)
+        self.assertFalse(arg_parsed.debug)
+
+    def test_init_args_const(self):
+        arg_parsed = server.init_args(args=['-l'])
+        self.assertEqual(arg_parsed.log, '/var/log/xbee_monitor.log')
+
+        arg_parsed = server.init_args(args=['--log'])
+        self.assertEqual(arg_parsed.log, '/var/log/xbee_monitor.log')
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
