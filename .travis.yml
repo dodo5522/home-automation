@@ -4,7 +4,7 @@ python:
 env:
     - BUILD_ENV=TravisCI
 install:
-    - "pip install --allow-external -r server/requirements.txt"
+    - "pip install -r server/requirements.txt --allow-external"
 script:
     - ./server/test.py
     - make -C documents/uml
