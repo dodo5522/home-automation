@@ -24,12 +24,6 @@ def init_args(args=None):
     '''
     parser = argparse.ArgumentParser(description='Server side script of XBee monitoring system.')
 
-    parser.add_argument('ports', \
-            nargs='*', \
-            action='store', \
-            default=['/dev/ttyAMA0'], \
-            metavar='xbee_serial_ports', \
-            help='XBee contributer\'s serial ports')
     parser.add_argument('-l', '--log', \
             nargs='?', \
             action='store', \
