@@ -80,7 +80,7 @@ if __name__ == '__main__':
     receivers = []
     receivers.append(xbeereceiver.ReceiverProcess(
         monitors,
-        port=arg_parsed.ports[0],
+        port='/dev/ttyAMA0',
         log_level=log_level))
 
     logger.info('receiver proces objects have been generated.')
