@@ -93,6 +93,15 @@ class MyUnitTest(unittest.TestCase):
         self.assertEqual(arg_parsed.log, '/var/log/xbee_monitor.log')
         arg_parsed = server.init_args(args=['--log'])
         self.assertEqual(arg_parsed.log, '/var/log/xbee_monitor.log')
+        arg_parsed = server.init_args(args=['-l', '/tmp/test.log'])
+        self.assertEqual(arg_parsed.log, '/tmp/test.log')
+        arg_parsed = server.init_args(args=['--log', '/tmp/test.log'])
+        self.assertEqual(arg_parsed.log, '/tmp/test.log')
+
+        arg_parsed = server.init_args(args=['-d'])
+        self.assertTrue(arg_parsed.debug)
+        arg_parsed = server.init_args(args=['--debug'])
+        self.assertTrue(arg_parsed.debug)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
