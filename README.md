@@ -25,3 +25,5 @@ Another function does not work yet.
 * server
     * Initialization and termination  
     ![initialize and terminate sequence flow](https://github.com/dodo5522/home-automation/blob/master/documents/uml/sequence_init_term.png)
+    * Monitoring nodes  
+    ![monitoring nodes](https://github.com/dodo5522/home-automation/blob/master/documents/uml/sequence_monitoring.png)
