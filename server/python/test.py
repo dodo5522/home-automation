@@ -29,7 +29,7 @@ class MyUnitTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_ClassBaseProcess(self):
+    def test_BaseProcess(self):
         wait_time = 4
 
         class TestChildProcess1(BaseProcess):
@@ -85,7 +85,7 @@ class MyUnitTest(unittest.TestCase):
         for process in p:
             self.assertFalse(process.is_alive())
 
-    def test_init_args(self):
+    def test_server(self):
         arg_parsed = server.init_args(args=[])
         self.assertIsNone(arg_parsed.log)
         self.assertFalse(arg_parsed.debug)
