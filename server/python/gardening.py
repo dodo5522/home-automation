@@ -11,10 +11,12 @@ import datetime
 import logging
 from base_modules import process
 from base_modules import xbeeparser
+from base_modules import config
 
 class VegetablesPlanterMonitor(\
         process.BaseProcess,
-        xbeeparser.XBeeApiRfDataParser):
+        xbeeparser.XBeeApiRfDataParser,
+        config.Configuration):
     '''
     This class monitors gardening status with XBee.
     And put the information to Xively.
@@ -29,19 +31,26 @@ class VegetablesPlanterMonitor(\
         'TMP0':'Temperature',
     }
 
-    def __init__(self, monitoring_address, xively_api_key, xively_feed_id, log_level=logging.INFO):
+    def __init__(self, log_level=logging.INFO):
         '''
         Initialize process etc.
         '''
+        config.Configuration.__init__(self, log_level=log_level)
         process.BaseProcess.__init__(self, log_level=log_level)
         xbeeparser.XBeeApiRfDataParser.__init__(self, \
                 sensors=len(VegetablesPlanterMonitor._XIVELY_ID_TABLE), \
                 log_level=log_level)
 
-        self._monitoring_address = monitoring_address
+        api_key = self.read_config('xively_api_key')
+        feed_id = self.read_config('xively_feed')
 
-        api = xively.XivelyAPIClient(xively_api_key)
-        self._xively_feed = api.feeds.get(xively_feed_id)
+        if api_key == None:
+            raise ValueError('Xively API key is not defined on conf file.')
+        if feed_id == None:
+            raise ValueError('Xively feed ID is not defined on conf file.')
+
+        api = xively.XivelyAPIClient(api_key)
+        self._xively_feed = api.feeds.get(feed_id)
 
         self._message_table[1] = self._do_post_data_to_service
 
@@ -51,7 +60,7 @@ class VegetablesPlanterMonitor(\
 
         Get XBee 64bit source address to monitor in this instance.
         '''
-        return self._monitoring_address
+        return self.read_config('address', int)
 
     def post_data_to_service(self, api_frame):
         '''

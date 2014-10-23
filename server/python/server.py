@@ -65,15 +65,8 @@ if __name__ == '__main__':
     logger = logging.getLogger(name=__name__)
 
     monitors = []
-    monitors.append(gardening.VegetablesPlanterMonitor(
-        0x0013a20040b44f84,
-        'h22...',
-        1779591762,
-        log_level=log_level))
-    #monitors.append(powerplant.SolarPowerMonitor(
-    #    0x0013a20040afbcce,
-    #    ,
-    #    log_level=log_level))
+    monitors.append(gardening.VegetablesPlanterMonitor(log_level=log_level))
+    #monitors.append(powerplant.SolarPowerMonitor(log_level=log_level))
 
     logger.info('monitor process objects have been generated.')
 
