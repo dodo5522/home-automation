@@ -15,12 +15,11 @@ class Configuration(object):
     The user class name will be section name automatically.
     '''
     def __init__(self, path_to_config=os.path.join(os.getcwd(), 'setting.conf'), log_level=logging.INFO):
-        self._path_to_config = path_to_config
         self._logger = logging.getLogger(name=type(self).__name__)
         self._logger.setLevel(log_level)
 
-        self._config = configparser.ConfigParser()
-        self._config.read(self._path_to_config)
+        self._config_data = configparser.ConfigParser()
+        self._config_data.read(path_to_config)
 
     def read_config(self, option, value_type=str):
         '''
@@ -35,13 +34,13 @@ class Configuration(object):
         if option is None:
             self._logger.debug('option is none.')
             return None
-        if not self._config.has_section(section):
+        if not self._config_data.has_section(section):
             self._logger.debug('{0} is none.'.format(section))
             return None
-        if not self._config.has_option(section, option):
+        if not self._config_data.has_option(section, option):
             self._logger.debug('{0} does not have {1}.'.format(section, option))
             return None
 
-        value = self._config[section][option]
+        value = self._config_data[section][option]
         return value_type(value)
 
