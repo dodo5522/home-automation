@@ -45,17 +45,3 @@ class Configuration(object):
         value = self._config[section][option]
         return value_type(value)
 
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
-
-    class TestMonitor(Configuration):
-        def __init__(self):
-            Configuration.__init__(self, log_level=logging.DEBUG)
-        def read(self):
-            return self.read_config('test', int)
-
-    monitor = TestMonitor()
-    value = monitor.read()
-
-    print(type(value))
-    print(value)

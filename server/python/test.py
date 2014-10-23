@@ -9,6 +9,7 @@ import datetime,time
 import server
 from base_modules.process import BaseProcess
 from base_modules.xbeereceiver import ReceiverProcess
+from base_modules.config import Configuration
 
 def measure_time(func):
     import functools
@@ -102,6 +103,32 @@ class MyUnitTest(unittest.TestCase):
         self.assertTrue(arg_parsed.debug)
         arg_parsed = server.init_args(args=['--debug'])
         self.assertTrue(arg_parsed.debug)
+
+    def test_ReceiverProcess(self):
+        pass
+
+    def test_Configuration(self):
+        config_test = []
+        config_test.append('[testmonitor]\n')
+        config_test.append('value1 = 123\n')
+        config_test.append('value2 = abc\n')
+
+        fp = open('setting.conf', 'w')
+        for line in config_test:
+            fp.write(line)
+        fp.close()
+
+        class TestMonitor(Configuration):
+            def __init__(self):
+                Configuration.__init__(self, log_level=logging.DEBUG)
+            def read_value1(self):
+                return self.read_config('value1', int)
+            def read_value2(self):
+                return self.read_config('value2')
+
+        sample_monitor = TestMonitor()
+        self.assertEqual(sample_monitor.read_value1(), 123)
+        self.assertEqual(sample_monitor.read_value2(), 'abc')
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
