@@ -9,6 +9,7 @@ import sys
 import argparse
 import time
 import logging
+import receiver
 import gardening
 from base_modules import xbeereceiver
 
@@ -71,10 +72,8 @@ if __name__ == '__main__':
     logger.info('monitor process objects have been generated.')
 
     receivers = []
-    receivers.append(xbeereceiver.ReceiverProcess(
-        monitors,
-        port='/dev/ttyAMA0',
-        log_level=log_level))
+    receivers.append(receiver.RPiUartReceiver(monitors, log_level=log_level))
+    #receivers.append(receiver.UsbSerReceiver(monitors, log_level=log_level))
 
     logger.info('receiver proces objects have been generated.')
 
