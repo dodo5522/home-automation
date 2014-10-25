@@ -11,7 +11,6 @@ import time
 import logging
 import receiver
 import gardening
-from base_modules import xbeereceiver
 
 LOGGING_FORMAT = '%(asctime)s %(name)-8s %(levelname)-8s: %(message)s'
 DATE_FORMAT = '%Y/%m/%d %H:%M:%S'
