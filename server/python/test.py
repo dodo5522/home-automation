@@ -112,6 +112,7 @@ class MyUnitTest(unittest.TestCase):
         config_test.append('[testmonitor]\n')
         config_test.append('value1 = 123\n')
         config_test.append('value2 = abc\n')
+        config_test.append('value3 = 0xff\n')
 
         fp = open('setting.conf', 'w')
         for line in config_test:
@@ -125,10 +126,13 @@ class MyUnitTest(unittest.TestCase):
                 return self.read_config('value1', int)
             def read_value2(self):
                 return self.read_config('value2')
+            def read_value3(self):
+                return self.read_config('value3', int, 16)
 
         sample_monitor = TestMonitor()
         self.assertEqual(sample_monitor.read_value1(), 123)
         self.assertEqual(sample_monitor.read_value2(), 'abc')
+        self.assertEqual(sample_monitor.read_value3(), 255)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
