@@ -25,21 +25,20 @@ Another function does not work yet.
 # How to use
 
 1. Locate 'setting.conf' with below values.
-```bash
-$ cat /etc/home-automation/setting.conf
-[rpiuartreceiver]
-port = /dev/ttyAMA0
-baurate = 9600
-[vegetablesplantermonitor]
-address = 0x0013a20040b44f84
-xively_api_key = xxx
-xively_feed = yyy
-```
+
+        $ cat /etc/home-automation/setting.conf
+        [rpiuartreceiver]
+        port = /dev/ttyAMA0
+        baurate = 9600
+        [vegetablesplantermonitor]
+        address = 0x0013a20040b44f84
+        xively_api_key = xxx
+        xively_feed = yyy
+
 2. Run the blew commands.
-```bash
-$ git clone https://github.com/dodo5522/home-automation
-$ python3 ./home-automation/server/python/server.py
-```
+
+        $ git clone https://github.com/dodo5522/home-automation
+        $ python3 ./home-automation/server/python/server.py
 
 # Sequence flow
 
