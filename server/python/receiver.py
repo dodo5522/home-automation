@@ -30,7 +30,7 @@ class RPiUartReceiver(\
         if self._baurate is None:
             raise ValueError('Serial baurate is not defined on conf file.')
 
-        xbeereceiver.ReceiverProcess.__init__(monitors, self._port, self._baurate, log_level=log_level)
+        xbeereceiver.ReceiverProcess.__init__(self, monitors, self._port, self._baurate, log_level=log_level)
 
 if __name__ == '__main__':
     config_test = []
