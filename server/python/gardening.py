@@ -80,7 +80,7 @@ class VegetablesPlanterMonitor(\
         got_sensor_info = self.get_senser_data(api_frame)
 
         now = datetime.datetime.utcnow()
-        self._logger.info(now)
+        self._logger.info('post sensor data at {0}.'.format(now))
 
         datastreams = []
         for sensor_type in got_sensor_info:
