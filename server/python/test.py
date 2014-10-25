@@ -2,7 +2,7 @@
 '''
 Unit test code
 '''
-
+import os
 import unittest
 import logging
 import datetime,time
@@ -120,7 +120,7 @@ class MyUnitTest(unittest.TestCase):
 
         class TestMonitor(Configuration):
             def __init__(self):
-                Configuration.__init__(self, log_level=logging.DEBUG)
+                Configuration.__init__(self, path_to_config=os.path.join(os.getcwd(), 'setting.conf'), log_level=logging.DEBUG)
             def read_value1(self):
                 return self.read_config('value1', int)
             def read_value2(self):

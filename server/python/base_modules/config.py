@@ -14,7 +14,7 @@ class Configuration(object):
     This class should be inherited by user class.
     The user class name will be section name automatically.
     '''
-    def __init__(self, path_to_config=os.path.join(os.getcwd(), 'setting.conf'), log_level=logging.INFO):
+    def __init__(self, path_to_config='/etc/home-automation/setting.conf', log_level=logging.INFO):
         self._logger = logging.getLogger(name=type(self).__name__)
         self._logger.setLevel(log_level)
 
