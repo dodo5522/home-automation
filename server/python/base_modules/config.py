@@ -21,7 +21,7 @@ class Configuration(object):
         self._config_data = configparser.ConfigParser()
         self._config_data.read(path_to_config)
 
-    def read_config(self, option, value_type=str):
+    def read_config(self, option, value_type=str, int_base=10):
         '''
         read_config: option string -> value
 
@@ -42,5 +42,9 @@ class Configuration(object):
             return None
 
         value = self._config_data[section][option]
-        return value_type(value)
+
+        if value_type == int:
+            return value_type(value, int_base)
+        else:
+            return value_type(value)
 

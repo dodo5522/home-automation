@@ -60,7 +60,7 @@ class VegetablesPlanterMonitor(\
 
         Get XBee 64bit source address to monitor in this instance.
         '''
-        return self.read_config('address', int)
+        return self.read_config('address', int, 16)
 
     def post_data_to_service(self, api_frame):
         '''
