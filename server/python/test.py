@@ -6,7 +6,6 @@ import os
 import unittest
 import logging
 import datetime,time
-import server
 from base_modules.process import BaseProcess
 from base_modules.xbeereceiver import ReceiverProcess
 from base_modules.config import Configuration
@@ -84,25 +83,6 @@ class MyUnitTest(unittest.TestCase):
 
         for process in p:
             self.assertFalse(process.is_alive())
-
-    def test_server(self):
-        arg_parsed = server.init_args(args=[])
-        self.assertIsNone(arg_parsed.log)
-        self.assertFalse(arg_parsed.debug)
-
-        arg_parsed = server.init_args(args=['-l'])
-        self.assertEqual(arg_parsed.log, '/var/log/xbee_monitor.log')
-        arg_parsed = server.init_args(args=['--log'])
-        self.assertEqual(arg_parsed.log, '/var/log/xbee_monitor.log')
-        arg_parsed = server.init_args(args=['-l', '/tmp/test.log'])
-        self.assertEqual(arg_parsed.log, '/tmp/test.log')
-        arg_parsed = server.init_args(args=['--log', '/tmp/test.log'])
-        self.assertEqual(arg_parsed.log, '/tmp/test.log')
-
-        arg_parsed = server.init_args(args=['-d'])
-        self.assertTrue(arg_parsed.debug)
-        arg_parsed = server.init_args(args=['--debug'])
-        self.assertTrue(arg_parsed.debug)
 
     def test_ReceiverProcess(self):
         pass
