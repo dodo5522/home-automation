@@ -21,6 +21,15 @@ class Configuration(object):
         self._config_data = configparser.ConfigParser()
         self._config_data.read(path_to_config)
 
+        if log_level == logging.DEBUG:
+            for section in self._config_data.sections():
+                if section != type(self).__name__.lower():
+                    continue
+
+                for option in self._config_data.options(section):
+                    value = self._config_data[section][option]
+                    self._logger.debug('{0}:{1}={2}'.format(section, option, value))
+
     def read_config(self, option, value_type=str, int_base=10):
         '''
         read_config: option string -> value
