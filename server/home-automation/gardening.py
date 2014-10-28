@@ -31,11 +31,11 @@ class VegetablesPlanterMonitor(\
         'TMP0':'Temperature',
     }
 
-    def __init__(self, log_level=logging.INFO):
+    def __init__(self, path_to_config, log_level=logging.INFO):
         '''
         Initialize process etc.
         '''
-        config.Configuration.__init__(self, log_level=log_level)
+        config.Configuration.__init__(self, path_to_config, log_level=log_level)
         process.BaseProcess.__init__(self, log_level=log_level)
         xbeeparser.XBeeApiRfDataParser.__init__(self, \
                 sensors=len(VegetablesPlanterMonitor._XIVELY_ID_TABLE), \

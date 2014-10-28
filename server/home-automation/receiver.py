@@ -16,11 +16,11 @@ class RPiUartReceiver(\
     Process to receive data from XBee.
     There should be only one instance against one XBee coordinator.
     '''
-    def __init__(self, monitors, log_level=logging.INFO):
+    def __init__(self, monitors, path_to_config, log_level=logging.INFO):
         self._logger = logging.getLogger(type(self).__name__)
         self._logger.setLevel(log_level)
 
-        config.Configuration.__init__(self, log_level=log_level)
+        config.Configuration.__init__(self, path_to_config, log_level=log_level)
 
         self._port = self.read_config('port')
         self._baurate = self.read_config('baurate', int)

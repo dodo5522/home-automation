@@ -15,6 +15,12 @@ LOGGING_FORMAT = '%(asctime)s %(name)-8s %(levelname)-8s: %(message)s'
 DATE_FORMAT = '%Y/%m/%d %H:%M:%S'
 
 parser = argparse.ArgumentParser(description='Server side script of XBee monitoring system.')
+parser.add_argument('-c', '--config', \
+        action='store', \
+        default='/etc/home_automation/setting.conf', \
+        required=False, \
+        metavar='path_to_conf_file', \
+        help='Path to config file')
 parser.add_argument('-l', '--log', \
         nargs='?', \
         action='store', \
@@ -53,14 +59,14 @@ if arg_parsed.log is not None:
 logger = logging.getLogger(name=__name__)
 
 monitors = []
-monitors.append(gardening.VegetablesPlanterMonitor(log_level=log_level))
-#monitors.append(powerplant.SolarPowerMonitor(log_level=log_level))
+monitors.append(gardening.VegetablesPlanterMonitor(arg_parsed.config, log_level=log_level))
+#monitors.append(powerplant.SolarPowerMonitor(arg_parsed.config, log_level=log_level))
 
 logger.info('monitor process objects have been generated.')
 
 receivers = []
-receivers.append(receiver.RPiUartReceiver(monitors, log_level=log_level))
-#receivers.append(receiver.UsbSerReceiver(monitors, log_level=log_level))
+receivers.append(receiver.RPiUartReceiver(monitors, arg_parsed.config, log_level=log_level))
+#receivers.append(receiver.UsbSerReceiver(monitors, arg_parsed.config, log_level=log_level))
 
 logger.info('receiver proces objects have been generated.')
 
