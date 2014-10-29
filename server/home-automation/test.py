@@ -6,9 +6,9 @@ import os
 import unittest
 import logging
 import datetime,time
-from base_modules.process import BaseProcess
-from base_modules.xbeereceiver import ReceiverProcess
-from base_modules.config import Configuration
+from base.process import BaseProcess
+from base.xbeereceiver import ReceiverProcess
+from base.config import Configuration
 
 def measure_time(func):
     import functools

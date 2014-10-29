@@ -9,9 +9,9 @@
 import xively
 import datetime
 import logging
-from base_modules import process
-from base_modules import xbeeparser
-from base_modules import config
+from base import process
+from base import xbeeparser
+from base import config
 
 class VegetablesPlanterMonitor(\
         process.BaseProcess,

@@ -6,8 +6,8 @@
  Version    : 1.0
 """
 import logging
-from base_modules import xbeereceiver
-from base_modules import config
+from base import xbeereceiver
+from base import config
 
 class RPiUartReceiver(\
         xbeereceiver.ReceiverProcess,\
