@@ -9,9 +9,9 @@
 import xively
 import datetime
 import logging
-from base import process
-from base import xbeeparser
-from base import config
+from home_automation.base import process
+from home_automation.base import xbeeparser
+from home_automation.base import config
 
 class VegetablesPlanterMonitor(\
         process.BaseProcess,

@@ -8,8 +8,8 @@
 import serial
 import logging
 from xbee import ZigBee
-from base_modules import process
-from base_modules import xbeeparser
+from home_automation.base import process
+from home_automation.base import xbeeparser
 
 class ReceiverProcess(\
         process.BaseProcess,

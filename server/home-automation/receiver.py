@@ -6,8 +6,8 @@
  Version    : 1.0
 """
 import logging
-from base import xbeereceiver
-from base import config
+from home_automation.base import xbeereceiver
+from home_automation.base import config
 
 class RPiUartReceiver(\
         xbeereceiver.ReceiverProcess,\
