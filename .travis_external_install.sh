@@ -10,3 +10,7 @@ cd python-xbee
 python ./setup.py build
 python ./setup.py install
 cd -
+cd server
+python ./setup.py build
+python ./setup.py install
+cd -
