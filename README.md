@@ -38,7 +38,10 @@ Another function does not work yet.
 2. Run the blew commands.
 
         $ git clone https://github.com/dodo5522/home-automation
-        $ python3 ./home-automation/server/python/server.py
+        $ cd ./home-automation/server
+        $ python3 ./setup.py build
+        $ sudo python3 ./setup.py install
+        $ nohup python3 -m home_automation &
 
 # Sequence flow
 
