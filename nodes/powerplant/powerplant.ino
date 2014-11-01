@@ -169,11 +169,13 @@ void setup(void)
     // Calibrate INA226. Rshunt = 0.002 ohm, Max excepted current = 1.11A
     g_ina_solar.calibrate(0.002, 4);
 
+#if (defined(ENABLE_DEBUG) || defined(ENABLE_DEBUG_SOFT_SERIAL))
     delay(5000);
 
-    // Display configuration
+    // Show configuration
     checkConfig(g_ina_battery);
-//    checkConfig(g_ina_solar);
+    checkConfig(g_ina_solar);
+#endif
 }
 
 void loop(void)
@@ -187,22 +189,20 @@ void loop(void)
         return;
 
     DEBUG_PRINT("battery:");
-    DEBUG_PRINT("shu A: "); DEBUG_PRINT(g_ina_battery.readShuntCurrent()); DEBUG_PRINT("\n");
-    DEBUG_PRINT("shu V: "); DEBUG_PRINT(g_ina_battery.readShuntVoltage()); DEBUG_PRINT("\n");
-    DEBUG_PRINT("bus P: "); DEBUG_PRINT(g_ina_battery.readBusPower());     DEBUG_PRINT("\n");
-    DEBUG_PRINT("bus V: "); DEBUG_PRINT(g_ina_battery.readBusVoltage());   DEBUG_PRINT("\n");
+    DEBUG_PRINT(" shu A: "); DEBUG_PRINT(g_ina_battery.readShuntCurrent()); DEBUG_PRINT("\n");
+    DEBUG_PRINT(" shu V: "); DEBUG_PRINT(g_ina_battery.readShuntVoltage()); DEBUG_PRINT("\n");
+    DEBUG_PRINT(" bus P: "); DEBUG_PRINT(g_ina_battery.readBusPower());     DEBUG_PRINT("\n");
+    DEBUG_PRINT(" bus V: "); DEBUG_PRINT(g_ina_battery.readBusVoltage());   DEBUG_PRINT("\n");
 
     DEBUG_PRINT("solar:\n");
-    DEBUG_PRINT("shu A: "); DEBUG_PRINT(g_ina_solar.readShuntCurrent()); DEBUG_PRINT("\n");
-    DEBUG_PRINT("shu V: "); DEBUG_PRINT(g_ina_solar.readShuntVoltage()); DEBUG_PRINT("\n");
-    DEBUG_PRINT("bus P: "); DEBUG_PRINT(g_ina_solar.readBusPower());     DEBUG_PRINT("\n");
-    DEBUG_PRINT("bus V: "); DEBUG_PRINT(g_ina_solar.readBusVoltage());   DEBUG_PRINT("\n");
+    DEBUG_PRINT(" shu A: "); DEBUG_PRINT(g_ina_solar.readShuntCurrent()); DEBUG_PRINT("\n");
+    DEBUG_PRINT(" shu V: "); DEBUG_PRINT(g_ina_solar.readShuntVoltage()); DEBUG_PRINT("\n");
+    DEBUG_PRINT(" bus P: "); DEBUG_PRINT(g_ina_solar.readBusPower());     DEBUG_PRINT("\n");
+    DEBUG_PRINT(" bus V: "); DEBUG_PRINT(g_ina_solar.readBusVoltage());   DEBUG_PRINT("\n");
 
     DEBUG_PRINT("charge converter:\n");
-    DEBUG_PRINT("bus V: "); DEBUG_PRINT(g_ina_converter.getBusVoltage_V());    DEBUG_PRINT("\n");
-    DEBUG_PRINT("shu V: "); DEBUG_PRINT(g_ina_converter.getShuntVoltage_mV()); DEBUG_PRINT("\n");
-    DEBUG_PRINT("cur mA: ");DEBUG_PRINT(g_ina_converter.getCurrent_mA());      DEBUG_PRINT("\n");
-
-    delay(3000);
+    DEBUG_PRINT(" bus V: "); DEBUG_PRINT(g_ina_converter.getBusVoltage_V());    DEBUG_PRINT("\n");
+    DEBUG_PRINT(" shu V: "); DEBUG_PRINT(g_ina_converter.getShuntVoltage_mV()); DEBUG_PRINT("\n");
+    DEBUG_PRINT(" cur mA: ");DEBUG_PRINT(g_ina_converter.getCurrent_mA());      DEBUG_PRINT("\n");
 }
 
