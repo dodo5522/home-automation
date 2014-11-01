@@ -173,13 +173,13 @@ void loop()
     {
         // Perform lux calculation:
         myLight.getLux(LIGHT_GAIN, lightIntegrationTime, lightData0, lightData1, nowLuxDouble);
-        sensorData[E_SENSOR_LUMINOSITY].value = (long)(10 * nowLuxDouble);
+        sensorData[E_SENSOR_LUMINOSITY].value = (int32_t)(10 * nowLuxDouble);
     }
 
-    sensorData[E_SENSOR_TEMPERATURE].value = (long)(10 * myHumidity.readTemperature());
-    sensorData[E_SENSOR_HUMIDITY].value    = (long)(10 * myHumidity.readHumidity());
-    sensorData[E_SENSOR_MOISTURE0].value   = (long)(10 * myMoisture0.getMoisturePercent());
-    sensorData[E_SENSOR_MOISTURE1].value   = (long)(10 * myMoisture1.getMoisturePercent());
+    sensorData[E_SENSOR_TEMPERATURE].value = (int32_t)(10 * myHumidity.readTemperature());
+    sensorData[E_SENSOR_HUMIDITY].value    = (int32_t)(10 * myHumidity.readHumidity());
+    sensorData[E_SENSOR_MOISTURE0].value   = (int32_t)(10 * myMoisture0.getMoisturePercent());
+    sensorData[E_SENSOR_MOISTURE1].value   = (int32_t)(10 * myMoisture1.getMoisturePercent());
 
     ZBTxRequest myTxRequest = ZBTxRequest(
             addrContributor,
