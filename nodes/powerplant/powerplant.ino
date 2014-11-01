@@ -35,6 +35,30 @@ static INA226 g_ina_solar;
 static INA226 g_ina_battery;
 static Adafruit_INA219 g_ina_converter(INA219_A0A1_ADDRESS);
 
+static unsigned long mainLoopInterval = MAIN_INTERVAL_MSEC;
+
+/****************************
+ * internal functions
+ ****************************/
+boolean isTriggerToPost(void)
+{
+    static unsigned long previous_tick_count = millis();
+    unsigned long current_tick_count = millis();
+
+    if(current_tick_count < previous_tick_count)
+    {
+        previous_tick_count = current_tick_count;
+        return false;
+    }
+    else if(current_tick_count - previous_tick_count < mainLoopInterval)
+    {
+        return false;
+    }
+
+    previous_tick_count = current_tick_count;
+    return true;
+}
+
 void checkConfig(INA226 ina)
 {
     DEBUG_PRINT("Mode:                  ");
@@ -158,6 +182,9 @@ void loop(void)
     static boolean led_on = false;
     digitalWrite(LED_SWITCH_PIN, led_on ? HIGH : LOW);
     led_on = !led_on;
+
+    if (isTriggerToPost() != true)
+        return;
 
     DEBUG_PRINT("battery:");
     DEBUG_PRINT("shu A: "); DEBUG_PRINT(g_ina_battery.readShuntCurrent()); DEBUG_PRINT("\n");
