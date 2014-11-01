@@ -109,8 +109,9 @@ void setup(void)
 {
     setup_debug();
 
-    pinMode(9, OUTPUT);
-    digitalWrite(9, LOW);
+    //FIXME: LED power on/off switch control.
+    pinMode(LED_SWITCH_PIN, OUTPUT);
+    digitalWrite(LED_SWITCH_PIN, LOW);
 
     g_ina_converter.begin();
     g_ina_battery.begin(INA226_CC_ADDRESS);
@@ -143,8 +144,9 @@ void setup(void)
 
 void loop(void)
 {
+    //FIXME: LED power on/off switch control.
     static boolean led_on = false;
-    digitalWrite(9, led_on ? HIGH : LOW);
+    digitalWrite(LED_SWITCH_PIN, led_on ? HIGH : LOW);
     led_on = !led_on;
 
     DEBUG_PRINT("battery:");
