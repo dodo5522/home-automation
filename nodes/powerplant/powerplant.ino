@@ -3,11 +3,20 @@
  Editor     : Takashi Ando
  Version    : 1.0
 */
-#include <Serial.h>
 #include <Wire.h>
 #include <INA226.h>
 #include <Adafruit_INA219.h>
+#include <datatype.h>
+#include "powerplant.h"
 
+#if defined(ENABLE_DEBUG_SOFT_SERIAL)
+#include <SoftwareSerial.h>
+#endif
+#include <debug.h>
+
+/****************************
+ * Macro definition
+ ****************************/
 //#define INA226_ADDRESS              (0x40)
 #define INA226_11_ADDRESS           (0x45)
 #define INA226_DD_ADDRESS           (0x4a)
@@ -24,81 +33,81 @@ static Adafruit_INA219 g_ina_converter(INA219_A0A1_ADDRESS);
 
 void checkConfig(INA226 ina)
 {
-    Serial.print("Mode:                  ");
+    DEBUG_PRINT("Mode:                  ");
     switch (ina.getMode())
     {
-        case INA226_MODE_POWER_DOWN:      Serial.println("Power-Down"); break;
-        case INA226_MODE_SHUNT_TRIG:      Serial.println("Shunt Voltage, Triggered"); break;
-        case INA226_MODE_BUS_TRIG:        Serial.println("Bus Voltage, Triggered"); break;
-        case INA226_MODE_SHUNT_BUS_TRIG:  Serial.println("Shunt and Bus, Triggered"); break;
-        case INA226_MODE_ADC_OFF:         Serial.println("ADC Off"); break;
-        case INA226_MODE_SHUNT_CONT:      Serial.println("Shunt Voltage, Continuous"); break;
-        case INA226_MODE_BUS_CONT:        Serial.println("Bus Voltage, Continuous"); break;
-        case INA226_MODE_SHUNT_BUS_CONT:  Serial.println("Shunt and Bus, Continuous"); break;
-        default: Serial.println("unknown");
+        case INA226_MODE_POWER_DOWN:      DEBUG_PRINT("Power-Down\n"); break;
+        case INA226_MODE_SHUNT_TRIG:      DEBUG_PRINT("Shunt Voltage, Triggered\n"); break;
+        case INA226_MODE_BUS_TRIG:        DEBUG_PRINT("Bus Voltage, Triggered\n"); break;
+        case INA226_MODE_SHUNT_BUS_TRIG:  DEBUG_PRINT("Shunt and Bus, Triggered\n"); break;
+        case INA226_MODE_ADC_OFF:         DEBUG_PRINT("ADC Off\n"); break;
+        case INA226_MODE_SHUNT_CONT:      DEBUG_PRINT("Shunt Voltage, Continuous\n"); break;
+        case INA226_MODE_BUS_CONT:        DEBUG_PRINT("Bus Voltage, Continuous\n"); break;
+        case INA226_MODE_SHUNT_BUS_CONT:  DEBUG_PRINT("Shunt and Bus, Continuous\n"); break;
+        default: DEBUG_PRINT("unknown\n");
     }
 
-    Serial.print("Samples average:       ");
+    DEBUG_PRINT("Samples average:       ");
     switch (ina.getAverages())
     {
-        case INA226_AVERAGES_1:           Serial.println("1 sample"); break;
-        case INA226_AVERAGES_4:           Serial.println("4 samples"); break;
-        case INA226_AVERAGES_16:          Serial.println("16 samples"); break;
-        case INA226_AVERAGES_64:          Serial.println("64 samples"); break;
-        case INA226_AVERAGES_128:         Serial.println("128 samples"); break;
-        case INA226_AVERAGES_256:         Serial.println("256 samples"); break;
-        case INA226_AVERAGES_512:         Serial.println("512 samples"); break;
-        case INA226_AVERAGES_1024:        Serial.println("1024 samples"); break;
-        default: Serial.println("unknown");
+        case INA226_AVERAGES_1:           DEBUG_PRINT("1 sample\n"); break;
+        case INA226_AVERAGES_4:           DEBUG_PRINT("4 samples\n"); break;
+        case INA226_AVERAGES_16:          DEBUG_PRINT("16 samples\n"); break;
+        case INA226_AVERAGES_64:          DEBUG_PRINT("64 samples\n"); break;
+        case INA226_AVERAGES_128:         DEBUG_PRINT("128 samples\n"); break;
+        case INA226_AVERAGES_256:         DEBUG_PRINT("256 samples\n"); break;
+        case INA226_AVERAGES_512:         DEBUG_PRINT("512 samples\n"); break;
+        case INA226_AVERAGES_1024:        DEBUG_PRINT("1024 samples\n"); break;
+        default: DEBUG_PRINT("unknown\n");
     }
 
-    Serial.print("Bus conversion time:   ");
+    DEBUG_PRINT("Bus conversion time:   ");
     switch (ina.getBusConversionTime())
     {
-        case INA226_BUS_CONV_TIME_140US:  Serial.println("140uS"); break;
-        case INA226_BUS_CONV_TIME_204US:  Serial.println("204uS"); break;
-        case INA226_BUS_CONV_TIME_332US:  Serial.println("332uS"); break;
-        case INA226_BUS_CONV_TIME_588US:  Serial.println("558uS"); break;
-        case INA226_BUS_CONV_TIME_1100US: Serial.println("1.100ms"); break;
-        case INA226_BUS_CONV_TIME_2116US: Serial.println("2.116ms"); break;
-        case INA226_BUS_CONV_TIME_4156US: Serial.println("4.156ms"); break;
-        case INA226_BUS_CONV_TIME_8244US: Serial.println("8.244ms"); break;
-        default: Serial.println("unknown");
+        case INA226_BUS_CONV_TIME_140US:  DEBUG_PRINT("140uS\n"); break;
+        case INA226_BUS_CONV_TIME_204US:  DEBUG_PRINT("204uS\n"); break;
+        case INA226_BUS_CONV_TIME_332US:  DEBUG_PRINT("332uS\n"); break;
+        case INA226_BUS_CONV_TIME_588US:  DEBUG_PRINT("558uS\n"); break;
+        case INA226_BUS_CONV_TIME_1100US: DEBUG_PRINT("1.100ms\n"); break;
+        case INA226_BUS_CONV_TIME_2116US: DEBUG_PRINT("2.116ms\n"); break;
+        case INA226_BUS_CONV_TIME_4156US: DEBUG_PRINT("4.156ms\n"); break;
+        case INA226_BUS_CONV_TIME_8244US: DEBUG_PRINT("8.244ms\n"); break;
+        default: DEBUG_PRINT("unknown\n");
     }
 
-    Serial.print("Shunt conversion time: ");
+    DEBUG_PRINT("Shunt conversion time: ");
     switch (ina.getShuntConversionTime())
     {
-        case INA226_SHUNT_CONV_TIME_140US:  Serial.println("140uS"); break;
-        case INA226_SHUNT_CONV_TIME_204US:  Serial.println("204uS"); break;
-        case INA226_SHUNT_CONV_TIME_332US:  Serial.println("332uS"); break;
-        case INA226_SHUNT_CONV_TIME_588US:  Serial.println("558uS"); break;
-        case INA226_SHUNT_CONV_TIME_1100US: Serial.println("1.100ms"); break;
-        case INA226_SHUNT_CONV_TIME_2116US: Serial.println("2.116ms"); break;
-        case INA226_SHUNT_CONV_TIME_4156US: Serial.println("4.156ms"); break;
-        case INA226_SHUNT_CONV_TIME_8244US: Serial.println("8.244ms"); break;
-        default: Serial.println("unknown");
+        case INA226_SHUNT_CONV_TIME_140US:  DEBUG_PRINT("140uS\n"); break;
+        case INA226_SHUNT_CONV_TIME_204US:  DEBUG_PRINT("204uS\n"); break;
+        case INA226_SHUNT_CONV_TIME_332US:  DEBUG_PRINT("332uS\n"); break;
+        case INA226_SHUNT_CONV_TIME_588US:  DEBUG_PRINT("558uS\n"); break;
+        case INA226_SHUNT_CONV_TIME_1100US: DEBUG_PRINT("1.100ms\n"); break;
+        case INA226_SHUNT_CONV_TIME_2116US: DEBUG_PRINT("2.116ms\n"); break;
+        case INA226_SHUNT_CONV_TIME_4156US: DEBUG_PRINT("4.156ms\n"); break;
+        case INA226_SHUNT_CONV_TIME_8244US: DEBUG_PRINT("8.244ms\n"); break;
+        default: DEBUG_PRINT("unknown\n");
     }
 
-    Serial.print("Max possible current:  ");
-    Serial.print(ina.getMaxPossibleCurrent());
-    Serial.println(" A");
+    DEBUG_PRINT("Max possible current:  ");
+    DEBUG_PRINT(ina.getMaxPossibleCurrent());
+    DEBUG_PRINT(" A\n");
 
-    Serial.print("Max current:           ");
-    Serial.print(ina.getMaxCurrent());
-    Serial.println(" A");
+    DEBUG_PRINT("Max current:           ");
+    DEBUG_PRINT(ina.getMaxCurrent());
+    DEBUG_PRINT(" A\n");
 
-    Serial.print("Max shunt voltage:     ");
-    Serial.print(ina.getMaxShuntVoltage());
-    Serial.println(" V");
+    DEBUG_PRINT("Max shunt voltage:     ");
+    DEBUG_PRINT(ina.getMaxShuntVoltage());
+    DEBUG_PRINT(" V\n");
 
-    Serial.print("Max power:             ");
-    Serial.print(ina.getMaxPower());
-    Serial.println(" W");
+    DEBUG_PRINT("Max power:             ");
+    DEBUG_PRINT(ina.getMaxPower());
+    DEBUG_PRINT(" W\n");
 }
 void setup(void)
 {
-    Serial.begin(9600);
+    setup_debug();
 
     pinMode(9, OUTPUT);
     digitalWrite(9, LOW);
@@ -129,7 +138,7 @@ void setup(void)
 
     // Display configuration
     checkConfig(g_ina_battery);
-    checkConfig(g_ina_solar);
+//    checkConfig(g_ina_solar);
 }
 
 void loop(void)
@@ -138,22 +147,22 @@ void loop(void)
     digitalWrite(9, led_on ? HIGH : LOW);
     led_on = !led_on;
 
-    Serial.println("battery:");
-    Serial.print("shu A: ");Serial.println(g_ina_battery.readShuntCurrent());
-    Serial.print("shu V: "); Serial.println(g_ina_battery.readShuntVoltage());
-    Serial.print("bus P: "); Serial.println(g_ina_battery.readBusPower());
-    Serial.print("bus V: "); Serial.println(g_ina_battery.readBusVoltage());
+    DEBUG_PRINT("battery:");
+    DEBUG_PRINT("shu A: "); DEBUG_PRINT(g_ina_battery.readShuntCurrent()); DEBUG_PRINT("\n");
+    DEBUG_PRINT("shu V: "); DEBUG_PRINT(g_ina_battery.readShuntVoltage()); DEBUG_PRINT("\n");
+    DEBUG_PRINT("bus P: "); DEBUG_PRINT(g_ina_battery.readBusPower());     DEBUG_PRINT("\n");
+    DEBUG_PRINT("bus V: "); DEBUG_PRINT(g_ina_battery.readBusVoltage());   DEBUG_PRINT("\n");
 
-    Serial.println("solar:");
-    Serial.print("shu A: ");Serial.println(g_ina_solar.readShuntCurrent());
-    Serial.print("shu V: "); Serial.println(g_ina_solar.readShuntVoltage());
-    Serial.print("bus P: "); Serial.println(g_ina_solar.readBusPower());
-    Serial.print("bus V: "); Serial.println(g_ina_solar.readBusVoltage());
+    DEBUG_PRINT("solar:\n");
+    DEBUG_PRINT("shu A: "); DEBUG_PRINT(g_ina_solar.readShuntCurrent()); DEBUG_PRINT("\n");
+    DEBUG_PRINT("shu V: "); DEBUG_PRINT(g_ina_solar.readShuntVoltage()); DEBUG_PRINT("\n");
+    DEBUG_PRINT("bus P: "); DEBUG_PRINT(g_ina_solar.readBusPower());     DEBUG_PRINT("\n");
+    DEBUG_PRINT("bus V: "); DEBUG_PRINT(g_ina_solar.readBusVoltage());   DEBUG_PRINT("\n");
 
-    Serial.println("charge converter:");
-    Serial.print("bus V: "); Serial.println(g_ina_converter.getBusVoltage_V());
-    Serial.print("shu V: "); Serial.println(g_ina_converter.getShuntVoltage_mV());
-    Serial.print("cur mA: ");Serial.println(g_ina_converter.getCurrent_mA());
+    DEBUG_PRINT("charge converter:\n");
+    DEBUG_PRINT("bus V: "); DEBUG_PRINT(g_ina_converter.getBusVoltage_V());    DEBUG_PRINT("\n");
+    DEBUG_PRINT("shu V: "); DEBUG_PRINT(g_ina_converter.getShuntVoltage_mV()); DEBUG_PRINT("\n");
+    DEBUG_PRINT("cur mA: ");DEBUG_PRINT(g_ina_converter.getCurrent_mA());      DEBUG_PRINT("\n");
 
     delay(3000);
 }
