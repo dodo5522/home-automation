@@ -14,24 +14,21 @@
 #include <HTU21D.h>
 #include <MOISTURE_SEN0114.h>
 #include <XBee.h>
+#include <datatype.h>
 #include "gardening.h"
+
+#if defined(ENABLE_DEBUG_SOFT_SERIAL)
+#include <SoftwareSerial.h>
+#endif
+#include <debug.h>
 
 /****************************
  * Macro definition
  ****************************/
-#ifdef DEBUG_GARDENING
-#include <SoftwareSerial.h>
-#define DEBUG_PRINT(...) debug_serial.print(__VA_ARGS__)
-#else
-#define DEBUG_PRINT(...)
-#endif
 
 /****************************
  * Global variables
  ****************************/
-#ifdef DEBUG_GARDENING
-static SoftwareSerial debug_serial = SoftwareSerial(DEBUG_SERIAL_RX_PIN, DEBUG_SERIAL_TX_PIN);
-#endif
 
 static XBee myXBee = XBee();
 static XBeeAddress64 addrContributor = XBeeAddress64(XBEE_ADDRESS_H_COORDINATOR, XBEE_ADDRESS_L_COORDINATOR);
@@ -134,12 +131,12 @@ void indicateStatusXBee(XBee &myXBee)
  ****************************/
 void setup()
 {
-#ifdef DEBUG_GARDENING
-    debug_serial.begin(DEBUG_SERIAL_BAURATE);
-#endif
+    setup_debug();
 
+#if !defined(ENABLE_DEBUG)
     Serial.begin(XBEE_SERIAL_BAURATE);
     myXBee.setSerial(Serial);
+#endif
 
     myHumidity.begin();
     myLight.begin();
@@ -189,10 +186,12 @@ void loop()
             (uint8_t*)sensorData,
             sizeof(sensorData));
 
+#if !defined(ENABLE_DEBUG)
     myXBee.send(myTxRequest);
 
     // this function takes 500ms as max when timeout error.
     indicateStatusXBee(myXBee);
+#endif
 
     DEBUG_PRINT("Luminosity:");  DEBUG_PRINT(sensorData[E_SENSOR_LUMINOSITY].value/10.0); DEBUG_PRINT("[lm]\n");
     DEBUG_PRINT("Moisture0 :");  DEBUG_PRINT(sensorData[E_SENSOR_MOISTURE0].value/10.0);  DEBUG_PRINT("[%]\n");

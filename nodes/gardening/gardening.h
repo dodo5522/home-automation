@@ -4,13 +4,11 @@
 /****************************
  * Macro definition
  ****************************/
-//#define DEBUG_GARDENING
-#define DEBUG_SERIAL_RX_PIN (8)
-#define DEBUG_SERIAL_TX_PIN (9)
-#define DEBUG_SERIAL_BAURATE (9600)
+//#define ENABLE_DEBUG_SOFT_SERIAL
+//#define ENABLE_DEBUG
 
 // If the interval is less than integration time, setup() set the integration time as minimum.
-#ifdef DEBUG_GARDENING
+#if (defined(ENABLE_DEBUG) || defined(ENABLE_DEBUG_SOFT_SERIAL))
 #define MAIN_INTERVAL_MSEC (10000)
 #else
 #define MAIN_INTERVAL_MSEC (300000)
@@ -38,13 +36,6 @@
 /****************************
  * Structures
  ****************************/
-typedef struct _SENSOR_DATA
-{
-    unsigned char type[3]; // ex. MOI means moisture
-    unsigned char number;  // number of the same type's multiple sensor
-    long value;            // value got from sensor *10 to indicate decimal part.
-}SENSOR_DATA;
-
 typedef enum _SENSOR_ARRAY_NUM
 {
     E_SENSOR_LUMINOSITY = 0,
