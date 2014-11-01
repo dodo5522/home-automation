@@ -7,6 +7,8 @@
 //#define ENABLE_DEBUG_SOFT_SERIAL
 #define ENABLE_DEBUG
 
+const int LED_SWITCH_PIN = 2;
+
 // If the interval is less than integration time, setup() set the integration time as minimum.
 #if (defined(ENABLE_DEBUG) || defined(ENABLE_DEBUG_SOFT_SERIAL))
 #define MAIN_INTERVAL_MSEC (10000)
