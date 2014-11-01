@@ -6,6 +6,7 @@
 #include <Wire.h>
 #include <INA226.h>
 #include <Adafruit_INA219.h>
+#include <XBee.h>
 #include <datatype.h>
 #include "powerplant.h"
 
@@ -26,6 +27,9 @@
 #define INA219_A0_ADDRESS           (0x41)
 #define INA219_A1_ADDRESS           (0x44)
 #define INA219_A0A1_ADDRESS         (0x45)
+
+static XBee myXBee = XBee();
+static XBeeAddress64 addrContributor = XBeeAddress64(XBEE_ADDRESS_H_COORDINATOR, XBEE_ADDRESS_L_COORDINATOR);
 
 static INA226 g_ina_solar;
 static INA226 g_ina_battery;
@@ -105,9 +109,15 @@ void checkConfig(INA226 ina)
     DEBUG_PRINT(ina.getMaxPower());
     DEBUG_PRINT(" W\n");
 }
+
 void setup(void)
 {
     setup_debug();
+
+#if !defined(ENABLE_DEBUG)
+    Serial.begin(XBEE_SERIAL_BAURATE);
+    myXBee.setSerial(Serial);
+#endif
 
     //FIXME: LED power on/off switch control.
     pinMode(LED_SWITCH_PIN, OUTPUT);
