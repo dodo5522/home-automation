@@ -34,17 +34,23 @@ typedef enum _SENSOR_ARRAY_NUM
 class IElectricPower
 {
 public:
-    virtual void begin(void);
+    IElectricPower(char *name);
+    virtual ~IElectricPower(void){};
 
-    virtual boolean hasAvilityCurrent(void);
-    virtual boolean hasAvilityVoltage(void);
-
-    virtual float getBusVoltage_V(void);
-    virtual float getShuntVoltage_V(void);
-    virtual float getShuntCurrent_A(void);
+    virtual void begin(void) = 0;
 
     virtual void showConfig(void);
-    virtual void showStatus(void);
+    virtual void showStatus(void) = 0;
+
+    virtual inline boolean hasAvilityCurrent(void){ return false; } ;
+    virtual inline boolean hasAvilityVoltage(void){ return false; };
+
+    virtual float getBusVoltage_V(void) = 0;
+    virtual float getShuntVoltage_V(void) = 0;
+    virtual float getShuntCurrent_A(void) = 0;
+
+protected:
+    char name_[16];
 };
 
 class MyINA226 : public IElectricPower
@@ -60,22 +66,21 @@ public:
             ina226_mode_t mode = INA226_MODE_SHUNT_BUS_CONT);
     virtual ~MyINA226(void){};
 
-    virtual void begin(void) final;
+    void begin(void);
 
-    virtual void showConfig(void) final;
-    virtual void showStatus(void) final;
+    void showConfig(void);
+    void showStatus(void);
 
-    virtual boolean hasAvilityCurrent(void) final { return true; };
-    virtual boolean hasAvilityVoltage(void) final { return true; };
+    inline boolean hasAvilityCurrent(void){ return true; };
+    inline boolean hasAvilityVoltage(void){ return true; };
 
-    virtual float getBusVoltage_V(void) final;
-    virtual float getShuntVoltage_V(void) final;
-    virtual float getShuntCurrent_A(void) final;
+    float getBusVoltage_V(void);
+    float getShuntVoltage_V(void);
+    float getShuntCurrent_A(void);
     float getBusPower_W(void);
 
 private:
     INA226 ina_;
-    char name_[16];
     uint8_t slave_address_;
     ina226_averages_t averages_;
     ina226_busConvTime_t busConvTime_;
@@ -91,21 +96,18 @@ public:
     MyINA219(char *name, uint8_t slave_address);
     virtual ~MyINA219(void){};
 
-    virtual void begin(void) final;
+    void begin(void) final;
 
-    virtual void showConfig(void) final {};
-    virtual void showStatus(void) final;
+    void showStatus(void);
 
-    virtual boolean hasAvilityCurrent(void) final { return true; };
-    virtual boolean hasAvilityVoltage(void) final { return false; };
+    inline boolean hasAvilityCurrent(void){ return true; };
 
-    virtual float getBusVoltage_V(void) final;
-    virtual float getShuntVoltage_V(void);
-    virtual float getShuntCurrent_A(void) final;
+    float getBusVoltage_V(void);
+    float getShuntVoltage_V(void);
+    float getShuntCurrent_A(void);
 
 private:
     Adafruit_INA219 ina_;
-    char name_[16];
 };
 
 #endif
