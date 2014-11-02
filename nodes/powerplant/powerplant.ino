@@ -29,6 +29,21 @@
 #define INA219_A0A1_ADDRESS         (0x45)
 
 /****************************
+ * IElectricPower class implementation
+ ****************************/
+IElectricPower::IElectricPower(char *name)
+{
+    strncpy(name_, name, sizeof(name_) - 1);
+}
+
+void IElectricPower::showConfig(void)
+{
+    DEBUG_PRINT("Name:                  "); DEBUG_PRINT(name_); DEBUG_PRINT("\n");
+    DEBUG_PRINT("Measure current        "); DEBUG_PRINT(hasAvilityCurrent()); DEBUG_PRINT("\n");
+    DEBUG_PRINT("Measure voltage        "); DEBUG_PRINT(hasAvilityVoltage()); DEBUG_PRINT("\n");
+}
+
+/****************************
  * MyINA226 class implementation
  ****************************/
 MyINA226::MyINA226(char *name,
@@ -39,7 +54,8 @@ MyINA226::MyINA226(char *name,
         ina226_busConvTime_t busConvTime,
         ina226_shuntConvTime_t shuntConvTime,
         ina226_mode_t mode)
-    :ina_(),
+    :IElectricPower(name),
+    ina_(),
     slave_address_(slave_address),
     averages_(averages),
     busConvTime_(busConvTime),
@@ -47,7 +63,6 @@ MyINA226::MyINA226(char *name,
     rShuntValueOhm_(rShuntValueOhm),
     iMaxExceptedCurrent_A_(iMaxExceptedCurrent_A)
 {
-    strncpy(name_, name, sizeof(name_) - 1);
 }
 
 void MyINA226::begin(void)
@@ -59,7 +74,7 @@ void MyINA226::begin(void)
 
 void MyINA226::showConfig(void)
 {
-    DEBUG_PRINT("Name:                  "); DEBUG_PRINT(name_); DEBUG_PRINT("\n");
+    IElectricPower::showConfig();
     DEBUG_PRINT("Mode:                  ");
     switch (ina_.getMode())
     {
@@ -155,9 +170,9 @@ inline float MyINA226::getBusPower_W(void)
  * MyINA219 class implementation
  ****************************/
 MyINA219::MyINA219(char *name, uint8_t slave_address)
-    :ina_(slave_address)
+    :IElectricPower(name),
+    ina_(slave_address)
 {
-    strncpy(name_, name, sizeof(name_) - 1);
 }
 
 void MyINA219::begin(void)
