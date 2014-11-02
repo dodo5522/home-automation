@@ -82,17 +82,18 @@ class XBeeApiRfDataParser(XBeeApiFrameBaseParser):
         '''
         Parse and return the information from sensors mounted on XBee module.
         '''
-        rf_data_format = ['4sl' for i in range(0, self._sensors)]
+        rf_data_format = ['4sll' for i in range(0, self._sensors)]
         rf_data_format = ''.join(rf_data_format)
         rf_data = struct.unpack(rf_data_format, self.get_rf_data(api_frame))
 
         sensor_info = {}
         for rf_word_num in range(0, self._sensors):
-            rf_data_4s = rf_data[rf_word_num*2+0]
+            rf_data_4s = rf_data[rf_word_num * 3 + 0]
             sensor_type = rf_data_4s.decode('ascii')
 
-            rf_data_l = rf_data[rf_word_num*2+1]
-            sensor_value = rf_data_l / 10.0
+            rf_data_multiple = (float)(rf_data[rf_word_num * 3 + 1])
+            rf_data_value = rf_data[rf_word_num * 3 + 2]
+            sensor_value = rf_data_value / rf_data_multiple
 
             sensor_info[sensor_type] = sensor_value
             self._logger.debug('type,value: {0},{1}'.format(sensor_type, sensor_value))
