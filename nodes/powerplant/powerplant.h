@@ -21,13 +21,13 @@
 /****************************
  * Structures
  ****************************/
-typedef enum _SENSOR_ARRAY_NUM
+enum class SENSOR_ARRAY_NUM : uint8_t
 {
     E_SENSOR_CURRENT_VOLTAGE0 = 0,
     E_SENSOR_CURRENT_VOLTAGE1,
     E_SENSOR_CURRENT,
     E_SENSOR_MAX,
-}SENSOR_ARRAY_NUM;
+};
 
 class IElectricPower
 {

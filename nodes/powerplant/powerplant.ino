@@ -16,19 +16,6 @@
 #include <debug.h>
 
 /****************************
- * Macro definition
- ****************************/
-//#define INA226_ADDRESS              (0x40)
-#define INA226_11_ADDRESS           (0x45)
-#define INA226_DD_ADDRESS           (0x4a)
-#define INA226_CC_ADDRESS           (0x4f)
-
-//#define INA219_ADDRESS              (0x40)
-#define INA219_A0_ADDRESS           (0x41)
-#define INA219_A1_ADDRESS           (0x44)
-#define INA219_A0A1_ADDRESS         (0x45)
-
-/****************************
  * IElectricPower class implementation
  ****************************/
 IElectricPower::IElectricPower(char *name)
@@ -202,6 +189,21 @@ float MyINA219::getShuntCurrent_A(void)
 {
     return ina_.getCurrent_mA()/1000.0;
 }
+
+/****************************
+ * Macro definition
+ ****************************/
+//const uint8_t INA226_ADDRESS  = 0x40;
+const uint8_t INA226_11_ADDRESS = 0x45;
+const uint8_t INA226_DD_ADDRESS = 0x4a;
+const uint8_t INA226_CC_ADDRESS = 0x4f;
+
+//const uint8_t INA219_ADDRESS    = 0x40;
+const uint8_t INA219_A0_ADDRESS   = 0x41;
+const uint8_t INA219_A1_ADDRESS   = 0x44;
+const uint8_t INA219_A0A1_ADDRESS = 0x45;
+
+const int LED_SWITCH_PIN = 2;
 
 /****************************
  * global variables
