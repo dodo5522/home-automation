@@ -133,7 +133,7 @@ void setup()
 {
     setup_debug();
 
-#if !defined(ENABLE_DEBUG)
+#if !defined(ENABLE_DEBUG_HARD_SERIAL)
     Serial.begin(XBEE_SERIAL_BAURATE);
     myXBee.setSerial(Serial);
 #endif

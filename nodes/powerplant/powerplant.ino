@@ -248,7 +248,7 @@ void setup(void)
 {
     setup_debug();
 
-#if !defined(ENABLE_DEBUG)
+#if !defined(ENABLE_DEBUG_HARD_SERIAL)
     Serial.begin(XBEE_SERIAL_BAURATE);
     myXBee.setSerial(Serial);
 #endif
@@ -262,7 +262,7 @@ void setup(void)
         sensor->begin();
     }
 
-#if (defined(ENABLE_DEBUG) || defined(ENABLE_DEBUG_SOFT_SERIAL))
+#if (defined(ENABLE_DEBUG_HARD_SERIAL) || defined(ENABLE_DEBUG_SOFT_SERIAL))
     delay(5000);
 
     // Show configuration
