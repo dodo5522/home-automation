@@ -133,7 +133,7 @@ void setup()
 {
     setup_debug();
 
-#if !defined(ENABLE_DEBUG)
+#if !defined(ENABLE_DEBUG_HARD_SERIAL)
     Serial.begin(XBEE_SERIAL_BAURATE);
     myXBee.setSerial(Serial);
 #endif
@@ -159,11 +159,11 @@ void loop()
     double nowLuxDouble = 0.0;
     SENSOR_DATA sensorData[E_SENSOR_MAX] =
     {
-        {{'L', 'U', 'X'}, '0', 0},
-        {{'M', 'O', 'I'}, '0', 0}, // for small planter
-        {{'M', 'O', 'I'}, '1', 0}, // for large planter
-        {{'H', 'U', 'M'}, '0', 0},
-        {{'T', 'M', 'P'}, '0', 0},
+        {{'L', 'U', 'X'}, '0', 10, 0},
+        {{'M', 'O', 'I'}, '0', 10, 0}, // for small planter
+        {{'M', 'O', 'I'}, '1', 10, 0}, // for large planter
+        {{'H', 'U', 'M'}, '0', 10, 0},
+        {{'T', 'M', 'P'}, '0', 10, 0},
     };
 
     if (isTriggerToPost() != true)
@@ -173,13 +173,18 @@ void loop()
     {
         // Perform lux calculation:
         myLight.getLux(LIGHT_GAIN, lightIntegrationTime, lightData0, lightData1, nowLuxDouble);
-        sensorData[E_SENSOR_LUMINOSITY].value = (int32_t)(10 * nowLuxDouble);
+        sensorData[E_SENSOR_LUMINOSITY].value =
+            (int32_t)(sensorData[E_SENSOR_LUMINOSITY].multiple * nowLuxDouble);
     }
 
-    sensorData[E_SENSOR_TEMPERATURE].value = (int32_t)(10 * myHumidity.readTemperature());
-    sensorData[E_SENSOR_HUMIDITY].value    = (int32_t)(10 * myHumidity.readHumidity());
-    sensorData[E_SENSOR_MOISTURE0].value   = (int32_t)(10 * myMoisture0.getMoisturePercent());
-    sensorData[E_SENSOR_MOISTURE1].value   = (int32_t)(10 * myMoisture1.getMoisturePercent());
+    sensorData[E_SENSOR_TEMPERATURE].value =
+        (int32_t)(sensorData[E_SENSOR_TEMPERATURE].multiple * myHumidity.readTemperature());
+    sensorData[E_SENSOR_HUMIDITY].value =
+        (int32_t)(sensorData[E_SENSOR_HUMIDITY].multiple * myHumidity.readHumidity());
+    sensorData[E_SENSOR_MOISTURE0].value =
+        (int32_t)(sensorData[E_SENSOR_MOISTURE0].multiple * myMoisture0.getMoisturePercent());
+    sensorData[E_SENSOR_MOISTURE1].value =
+        (int32_t)(sensorData[E_SENSOR_MOISTURE1].multiple * myMoisture1.getMoisturePercent());
 
     ZBTxRequest myTxRequest = ZBTxRequest(
             addrContributor,
@@ -193,9 +198,9 @@ void loop()
     indicateStatusXBee(myXBee);
 #endif
 
-    DEBUG_PRINT("Luminosity:");  DEBUG_PRINT(sensorData[E_SENSOR_LUMINOSITY].value/10.0); DEBUG_PRINT("[lm]\n");
-    DEBUG_PRINT("Moisture0 :");  DEBUG_PRINT(sensorData[E_SENSOR_MOISTURE0].value/10.0);  DEBUG_PRINT("[%]\n");
-    DEBUG_PRINT("Moisture1 :");  DEBUG_PRINT(sensorData[E_SENSOR_MOISTURE1].value/10.0);  DEBUG_PRINT("[%]\n");
-    DEBUG_PRINT("Humidity :");   DEBUG_PRINT(sensorData[E_SENSOR_HUMIDITY].value/10.0);   DEBUG_PRINT("[%]\n");
-    DEBUG_PRINT("Temperature :");DEBUG_PRINT(sensorData[E_SENSOR_TEMPERATURE].value/10.0);DEBUG_PRINT("[C]\n");
+    DEBUG_PRINT("Luminosity:");  DEBUG_PRINT(sensorData[E_SENSOR_LUMINOSITY].value /(float)sensorData[E_SENSOR_LUMINOSITY].multiple); DEBUG_PRINT("[lm]\n");
+    DEBUG_PRINT("Moisture0 :");  DEBUG_PRINT(sensorData[E_SENSOR_MOISTURE0].value  /(float)sensorData[E_SENSOR_MOISTURE0].multiple);  DEBUG_PRINT("[%]\n");
+    DEBUG_PRINT("Moisture1 :");  DEBUG_PRINT(sensorData[E_SENSOR_MOISTURE1].value  /(float)sensorData[E_SENSOR_MOISTURE1].multiple);  DEBUG_PRINT("[%]\n");
+    DEBUG_PRINT("Humidity :");   DEBUG_PRINT(sensorData[E_SENSOR_HUMIDITY].value   /(float)sensorData[E_SENSOR_HUMIDITY].multiple);   DEBUG_PRINT("[%]\n");
+    DEBUG_PRINT("Temperature :");DEBUG_PRINT(sensorData[E_SENSOR_TEMPERATURE].value/(float)sensorData[E_SENSOR_TEMPERATURE].multiple);DEBUG_PRINT("[C]\n");
 }

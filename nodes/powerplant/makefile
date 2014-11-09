@@ -12,6 +12,6 @@ CXXFLAGS_STD     = -std=c++11
 CPPFLAGS        += -fno-threadsafe-statics
 
 AVRDUDE_ARD_BAUDRATE = 57600
-AVRDUDE_CONF = /Applications/Arduino.app/Contents/Resources/Java/hardware/tools/avr/etc/avrdude.conf
+AVRDUDE_CONF = $(ARDUINO_DIR)/hardware/tools/avr/etc/avrdude.conf
 
 include ../make_env/Arduino.mk

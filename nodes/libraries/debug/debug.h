@@ -19,14 +19,14 @@ inline void setup_debug(void)
 {
 #if defined(ENABLE_DEBUG_SOFT_SERIAL)
     SoftSerial.begin(DEBUG_SERIAL_BAURATE);
-#elif defined(ENABLE_DEBUG)
+#elif defined(ENABLE_DEBUG_HARD_SERIAL)
     Serial.begin(DEBUG_SERIAL_BAURATE);
 #endif
 }
 
 #if defined(ENABLE_DEBUG_SOFT_SERIAL)
 #define DEBUG_PRINT(...)    SoftSerial.print(__VA_ARGS__);
-#elif defined(ENABLE_DEBUG)
+#elif defined(ENABLE_DEBUG_HARD_SERIAL)
 #define DEBUG_PRINT(...)    Serial.print(__VA_ARGS__);
 #else
 #define DEBUG_PRINT(...)
