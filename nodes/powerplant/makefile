@@ -9,5 +9,6 @@ F_CPU            = 8000000L
 HEX_MAXIMUM_SIZE = 16384
 ARDUINO_LIBS     = SoftwareSerial Wire XBee INA226 Adafruit_INA219 datatype debug
 CXXFLAGS_STD     = -std=c++11
+CPPFLAGS        += -fno-threadsafe-statics
 
 include ../make_env/Arduino.mk
