@@ -1,7 +1,7 @@
 ARDUINO_DIR      = /Applications/Arduino.app/Contents/Resources/Java
 ARDMK_DIR        = ../make_env
 AVR_TOOLS_DIR    = $(ARDUINO_DIR)/hardware/tools/avr
-MONITOR_PORT     = /dev/ttyACM0
+MONITOR_PORT     = /dev/cu.usb*
 MONITOR_BAUDRATE = 9600
 BOARD_TAG        = pro
 MCU              = atmega328p
@@ -10,5 +10,8 @@ HEX_MAXIMUM_SIZE = 16384
 ARDUINO_LIBS     = SoftwareSerial Wire XBee INA226 Adafruit_INA219 datatype debug
 CXXFLAGS_STD     = -std=c++11
 CPPFLAGS        += -fno-threadsafe-statics
+
+AVRDUDE_ARD_BAUDRATE = 57600
+AVRDUDE_CONF = /Applications/Arduino.app/Contents/Resources/Java/hardware/tools/avr/etc/avrdude.conf
 
 include ../make_env/Arduino.mk
