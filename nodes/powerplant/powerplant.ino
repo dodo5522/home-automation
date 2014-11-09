@@ -213,13 +213,13 @@ static XBeeAddress64 addrContributor = XBeeAddress64(XBEE_ADDRESS_H_COORDINATOR,
 
 static MyINA226 battery = MyINA226("battery", INA226_CC_ADDRESS);
 static MyINA226 solar = MyINA226("solar panel", INA226_DD_ADDRESS);
-static MyINA219 conv = MyINA219("converter", INA219_A0A1_ADDRESS);
+//static MyINA219 conv = MyINA219("converter", INA219_A0A1_ADDRESS);
 
 static IElectricPower *powerSensors[] =
 {
     static_cast<IElectricPower*>(&battery),
     static_cast<IElectricPower*>(&solar),
-    static_cast<IElectricPower*>(&conv)
+//    static_cast<IElectricPower*>(&conv)
 };
 
 static unsigned long mainLoopInterval = MAIN_INTERVAL_MSEC;
@@ -277,8 +277,30 @@ void setup(void)
 
 void loop(void)
 {
+    enum class SensorType : uint8_t
+    {
+        VOLTAGE = 0,
+        CURRENT,
+        WAT,
+        MAX
+    };
+
     //FIXME: LED power on/off switch control.
     static boolean led_on = false;
+    SENSOR_DATA sensor_data[sizeof(powerSensors)/sizeof(IElectricPower*)][static_cast<int>(SensorType::MAX)] =
+    {
+        {
+            {{'V', 'O', 'L'}, '0', 100, 0}, // bus voltage
+            {{'C', 'U', 'R'}, '0', 100, 0}, // shunt current
+            {{'W', 'A', 'T'}, '0', 100, 0}, // power
+        },
+        {
+            {{'V', 'O', 'L'}, '0', 100, 0}, // bus voltage
+            {{'C', 'U', 'R'}, '0', 100, 0}, // shunt current
+            {{'W', 'A', 'T'}, '0', 100, 0}, // power
+        },
+    };
+
     digitalWrite(LED_SWITCH_PIN, led_on ? HIGH : LOW);
     led_on = !led_on;
 
@@ -287,9 +309,28 @@ void loop(void)
         return;
     }
 
+#if (defined(ENABLE_DEBUG_HARD_SERIAL) || defined(ENABLE_DEBUG_SOFT_SERIAL))
     for(auto sensor : powerSensors)
     {
         sensor->showStatus();
     }
+#endif
+
+    for(uint8_t i = 0; i < sizeof(powerSensors)/sizeof(IElectricPower*); i++)
+    {
+        //FIXME: INA219 will crash.
+        sensor_data[i][0].value = static_cast<int32_t>(sensor_data[i][0].multiple * static_cast<MyINA226*>(powerSensors[i])->getBusVoltage_V());
+        sensor_data[i][1].value = static_cast<int32_t>(sensor_data[i][1].multiple * static_cast<MyINA226*>(powerSensors[i])->getShuntCurrent_A());
+        sensor_data[i][2].value = static_cast<int32_t>(sensor_data[i][2].multiple * static_cast<MyINA226*>(powerSensors[i])->getBusPower_W());
+    }
+
+#if !defined(ENABLE_DEBUG_HARD_SERIAL)
+    ZBTxRequest myTxRequest = ZBTxRequest(
+            addrContributor,
+            (uint8_t*)sensor_data,
+            sizeof(sensor_data));
+
+    myXBee.send(myTxRequest);
+#endif
 }
 
