@@ -208,8 +208,10 @@ const int LED_SWITCH_PIN = 2;
 /****************************
  * global variables
  ****************************/
+#if !defined(ENABLE_DEBUG_HARD_SERIAL)
 static XBee myXBee = XBee();
 static XBeeAddress64 addrContributor = XBeeAddress64(XBEE_ADDRESS_H_COORDINATOR, XBEE_ADDRESS_L_COORDINATOR);
+#endif
 
 static MyINA226 battery = MyINA226("battery", INA226_CC_ADDRESS);
 static MyINA226 solar = MyINA226("solar panel", INA226_DD_ADDRESS);

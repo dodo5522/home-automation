@@ -10,6 +10,9 @@ HEX_MAXIMUM_SIZE = 16384
 ARDUINO_LIBS     = SoftwareSerial Wire XBee TSL2561 HTU21D MOISTURE_SEN0114 datatype debug
 CXXFLAGS_STD     = -std=c++11
 CPPFLAGS        += -fno-threadsafe-statics
+ifneq ($(DEBUG),)
+CPPFLAGS        += -DENABLE_DEBUG_$(DEBUG)_SERIAL
+endif
 
 AVRDUDE_ARD_BAUDRATE = 57600
 AVRDUDE_CONF = $(ARDUINO_DIR)/hardware/tools/avr/etc/avrdude.conf
