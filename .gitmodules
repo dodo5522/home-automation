@@ -13,3 +13,6 @@
 [submodule "nodes/libraries/INA226"]
 	path = nodes/libraries/INA226
 	url = https://github.com/jarzebski/Arduino-INA226
+[submodule "nodes/make_env"]
+	path = nodes/make_env
+	url = https://github.com/sudar/Arduino-Makefile.git
