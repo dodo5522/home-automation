@@ -52,8 +52,11 @@ class ReceiverProcess(\
             if addr == monitor.get_monitoring_address():
                 monitor.post_data_to_service(api_frame)
 
-    def _do_terminate(self):
-        '''Wait and join all thread and process.
+    def _terminate(self):
+        '''
+        _terminate: None -> None
+
+        Wait and join all thread and process.
         '''
         # halt() must be called before closing the serial
         # port in order to ensure proper thread shutdown

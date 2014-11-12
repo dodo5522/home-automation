@@ -11,7 +11,7 @@ import logging
 class BaseProcess(multiprocessing.Process):
     '''Base class to generate process with conmunication by queue messaging.
     '''
-    QUEUE_ID_TERMINATE = 0
+    _ID_TERMINATE_PROCESS = -1
 
     def __init__(self, log_level=None):
         '''Initialize process.
@@ -23,9 +23,7 @@ class BaseProcess(multiprocessing.Process):
         multiprocessing.Process.__init__(self, name=type(self).__name__)
 
         self._message_queue = multiprocessing.Queue()
-
         self._message_table = {}
-        self._message_table[BaseProcess.QUEUE_ID_TERMINATE] = self._do_terminate
 
     def run(self):
         '''Parse message queue.
@@ -35,17 +33,21 @@ class BaseProcess(multiprocessing.Process):
 
             queue_id = item[0]
             queue_args = item[1]
-            func = self._message_table[queue_id]
 
             self._logger.debug('got message with id {0} with args {1}.'.format(queue_id, queue_args))
 
+            if queue_id == BaseProcess._ID_TERMINATE_PROCESS:
+                break
+            elif queue_id not in self._message_table:
+                raise NotImplementedError("Handler atainst ID does not exist.")
+
+            func = self._message_table[queue_id]
             if queue_args is None:
                 func()
             else:
                 func(queue_args)
 
-            if queue_id == BaseProcess.QUEUE_ID_TERMINATE:
-                break
+        self._terminate()
 
     def post_queue(self, queue_id, queue_args=None):
         '''Post message to message handler.
@@ -56,10 +58,26 @@ class BaseProcess(multiprocessing.Process):
         '''Post message to terminate this process.
            You shoul wait for joined with join() method.
         '''
-        self.post_queue(BaseProcess.QUEUE_ID_TERMINATE)
+        self.post_queue(BaseProcess._ID_TERMINATE_PROCESS)
 
-    def _do_terminate(self):
-        '''Terminate procedure should be implemented by ingerited class.
+    def append_queue_handler(self, queue_id, handler):
+        '''
+        append_queue_handler: None -> None
+
+        Add new handler against the queue ID.
+        If there is the handler against ID, raise ValueError.
+        '''
+        if queue_id in self._message_table:
+            raise ValueError("The ID {0} is already set.".format(queue_id))
+
+        self._message_table[queue_id] = handler
+
+    def _terminate(self):
+        '''
+        _terminate: None -> None
+
+        This function is called after break queue handler loop.
+        This function should be implemented to close all instance used in this process.
         '''
         pass
 

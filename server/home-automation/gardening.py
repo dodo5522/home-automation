@@ -21,6 +21,7 @@ class VegetablesPlanterMonitor(\
     This class monitors gardening status with XBee.
     And put the information to Xively.
     '''
+    _ID_POST_TO_SERVICE = 0
 
     _XIVELY_ID_TABLE = \
     {
@@ -52,7 +53,7 @@ class VegetablesPlanterMonitor(\
         api = xively.XivelyAPIClient(api_key)
         self._xively_feed = api.feeds.get(feed_id)
 
-        self._message_table[1] = self._do_post_data_to_service
+        self.append_queue_handler(self._ID_POST_TO_SERVICE, self._do_post_data_to_service)
 
     def get_monitoring_address(self):
         '''
@@ -69,7 +70,7 @@ class VegetablesPlanterMonitor(\
         Post monitored data to this instance's message handler
         to parse and send it to some services like Xively etc.
         '''
-        self.post_queue(1, api_frame)
+        self.post_queue(self._ID_POST_TO_SERVICE, api_frame)
 
     def _do_post_data_to_service(self, api_frame):
         '''
