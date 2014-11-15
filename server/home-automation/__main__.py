@@ -15,7 +15,7 @@ from home_automation import gardening
 LOGGING_FORMAT = '%(asctime)s %(name)-8s %(levelname)-8s: %(message)s'
 DATE_FORMAT = '%Y/%m/%d %H:%M:%S'
 
-RUNNING = False
+RUNNING = True
 
 def stop():
     '''
