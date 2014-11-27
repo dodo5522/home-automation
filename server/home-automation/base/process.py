@@ -6,6 +6,7 @@
  Version    : 1.0
 """
 import multiprocessing
+import queue
 import logging
 
 class BaseProcess(multiprocessing.Process):
@@ -25,29 +26,36 @@ class BaseProcess(multiprocessing.Process):
         self._message_queue = multiprocessing.Queue()
         self._message_table = {}
 
+        self._running = False
+
     def run(self):
         '''Parse message queue.
         '''
-        while True:
-            item = self._message_queue.get()
+        self._running = True
 
-            queue_id = item[0]
-            queue_args = item[1]
+        while self._running:
+            try:
+                item = self._message_queue.get(block=True, timeout=3)
 
-            self._logger.debug('got message with id {0} with args {1}.'.format(queue_id, queue_args))
+            except queue.Empty:
+                continue
 
-            if queue_id == BaseProcess._ID_TERMINATE_PROCESS:
-                break
-            elif queue_id not in self._message_table:
-                raise NotImplementedError("Handler atainst ID does not exist.")
-
-            func = self._message_table[queue_id]
-            if queue_args is None:
-                func()
             else:
-                func(queue_args)
+                queue_id = item[0]
+                queue_args = item[1]
 
-        self._terminate()
+                self._logger.debug('got message with id {0} with args {1}.'.format(queue_id, queue_args))
+
+                if queue_id == BaseProcess._ID_TERMINATE_PROCESS:
+                    self._terminate()
+                elif queue_id not in self._message_table:
+                    raise NotImplementedError("Handler atainst ID does not exist.")
+
+                func = self._message_table[queue_id]
+                if queue_args is None:
+                    func()
+                else:
+                    func(queue_args)
 
     def post_queue(self, queue_id, queue_args=None):
         '''Post message to message handler.
@@ -79,5 +87,5 @@ class BaseProcess(multiprocessing.Process):
         This function is called after break queue handler loop.
         This function should be implemented to close all instance used in this process.
         '''
-        pass
+        self._running = False
 
