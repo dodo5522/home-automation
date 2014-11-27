@@ -17,7 +17,7 @@ DATE_FORMAT = '%Y/%m/%d %H:%M:%S'
 
 RUNNING = True
 
-def stop():
+def stop(signum, frame):
     '''
     stop:None -> None
 
@@ -88,19 +88,22 @@ def main():
 
     logger.info('receiver proces objects have been generated.')
 
-    for receiver in receivers:
-        receiver.start()
+    for obj in receivers:
+        obj.start()
 
     logger.info('all receiver process has started.')
 
     while RUNNING:
         #FIXME: check if all receiver process is alive or not.
+        logger.debug('sleeping...')
         time.sleep(3)
 
-    for receiver in receivers:
-        receiver.post_terminate()
-        receiver.join(30)
-        logger.info('{PROCESS} is joined.'.format(PROCESS=receiver))
+    for obj in receivers:
+        logger.debug('terminating {0}'.format(obj))
+        obj.post_terminate()
+        logger.debug('joining {0}'.format(obj))
+        obj.join(30)
+        logger.info('joined {0}'.format(obj))
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, stop)
