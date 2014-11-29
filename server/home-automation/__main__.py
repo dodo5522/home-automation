@@ -8,82 +8,98 @@
 import argparse
 import time
 import logging
+import signal
 from home_automation import receiver
-from home_automation import gardening
 
 LOGGING_FORMAT = '%(asctime)s %(name)-8s %(levelname)-8s: %(message)s'
 DATE_FORMAT = '%Y/%m/%d %H:%M:%S'
 
-parser = argparse.ArgumentParser(description='Server side script of XBee monitoring system.')
-parser.add_argument('-c', '--config', \
-        action='store', \
-        default='/etc/home_automation/setting.conf', \
-        required=False, \
-        metavar='path_to_conf_file', \
-        help='Path to config file')
-parser.add_argument('-l', '--log', \
-        nargs='?', \
-        action='store', \
-        default=None, \
-        const='/var/log/xbee_monitor.log', \
-        required=False, \
-        metavar='path_to_log_file', \
-        help='Path to log file')
-parser.add_argument('-d', '--debug', \
-        action='store_true', \
-        default=False, \
-        required=False, \
-        help='Pint message for debug')
+RUNNING = True
 
-arg_parsed = parser.parse_args()
+def stop(signum, frame):
+    '''
+    stop:None -> None
 
-if arg_parsed.debug:
-    log_level = logging.DEBUG
-else:
-    log_level = logging.INFO
+    stop main loop function which is called by signal handler.
+    '''
+    global RUNNING
+    RUNNING = False
 
-# root logger setting with default Formatter and StreamHandler.
-logging.basicConfig(
-    level=log_level,
-    format=LOGGING_FORMAT,
-    datefmt=DATE_FORMAT)
+def main():
+    '''
+    main:None -> None
 
-# add logging handler of file to root logger.
-if arg_parsed.log is not None:
-    formatter = logging.Formatter(fmt=LOGGING_FORMAT, datefmt=DATE_FORMAT)
-    handler = logging.FileHandler(arg_parsed.log, mode='a')
-    handler.setFormatter(formatter)
-    logging.getLogger().addHandler(handler)
-    #logging.getLogger().removeHandler(handler)
+    main loop function.
+    '''
+    parser = argparse.ArgumentParser(description='Server side script of XBee monitoring system.')
+    parser.add_argument('-c', '--config', \
+            action='store', \
+            default='/etc/home_automation/setting.conf', \
+            required=False, \
+            metavar='path_to_conf_file', \
+            help='Path to config file')
+    parser.add_argument('-l', '--log', \
+            nargs='?', \
+            action='store', \
+            default=None, \
+            const='/var/log/xbee_monitor.log', \
+            required=False, \
+            metavar='path_to_log_file', \
+            help='Path to log file')
+    parser.add_argument('-d', '--debug', \
+            action='store_true', \
+            default=False, \
+            required=False, \
+            help='Pint message for debug')
 
-logger = logging.getLogger(name=__name__)
+    arg_parsed = parser.parse_args()
 
-monitors = []
-monitors.append(gardening.VegetablesPlanterMonitor(arg_parsed.config, log_level=log_level))
-#monitors.append(powerplant.SolarPowerMonitor(arg_parsed.config, log_level=log_level))
+    if arg_parsed.debug:
+        log_level = logging.DEBUG
+    else:
+        log_level = logging.INFO
 
-logger.info('monitor process objects have been generated.')
+    # root logger setting with default Formatter and StreamHandler.
+    logging.basicConfig(
+        level=log_level,
+        format=LOGGING_FORMAT,
+        datefmt=DATE_FORMAT)
 
-receivers = []
-receivers.append(receiver.RPiUartReceiver(monitors, arg_parsed.config, log_level=log_level))
-#receivers.append(receiver.UsbSerReceiver(monitors, arg_parsed.config, log_level=log_level))
+    # add logging handler of file to root logger.
+    if arg_parsed.log is not None:
+        formatter = logging.Formatter(fmt=LOGGING_FORMAT, datefmt=DATE_FORMAT)
+        handler = logging.FileHandler(arg_parsed.log, mode='a')
+        handler.setFormatter(formatter)
+        logging.getLogger().addHandler(handler)
+        #logging.getLogger().removeHandler(handler)
 
-logger.info('receiver proces objects have been generated.')
+    logger = logging.getLogger(name=__name__)
 
-for receiver in receivers:
-    receiver.start()
+    receivers = []
+    receivers.append(receiver.RPiUartReceiver(arg_parsed.config, log_level=log_level))
+    #receivers.append(receiver.UsbSerReceiver(arg_parsed.config, log_level=log_level))
 
-logger.info('all receiver process has started.')
+    logger.info('receiver proces objects have been generated.')
 
-while True:
-    try:
+    for obj in receivers:
+        obj.start()
+        obj.start_monitors()
+
+    logger.info('all receiver process has started.')
+
+    while RUNNING:
         #FIXME: check if all receiver process is alive or not.
-        time.sleep(10)
-    except KeyboardInterrupt:
-        break
+        logger.debug('sleeping...')
+        time.sleep(3)
 
-for receiver in receivers:
-    receiver.post_terminate()
-    receiver.join(30)
-    logger.info('{PROCESS} is joined.'.format(PROCESS=receiver))
+    for obj in receivers:
+        obj.post_terminate()
+        logger.debug('terminating {0}'.format(obj))
+        obj.join(30)
+        logger.info('joined {0}'.format(obj))
+
+if __name__ == '__main__':
+    signal.signal(signal.SIGINT, stop)
+    signal.signal(signal.SIGTERM, stop)
+    main()
 
