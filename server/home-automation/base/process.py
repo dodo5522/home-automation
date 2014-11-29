@@ -50,12 +50,12 @@ class BaseProcess(multiprocessing.Process):
                     self._terminate()
                 elif queue_id not in self._message_table:
                     raise NotImplementedError("Handler atainst ID does not exist.")
-
-                func = self._message_table[queue_id]
-                if queue_args is None:
-                    func()
                 else:
-                    func(queue_args)
+                    func = self._message_table[queue_id]
+                    if queue_args is None:
+                        func()
+                    else:
+                        func(queue_args)
 
     def post_queue(self, queue_id, queue_args=None):
         '''Post message to message handler.

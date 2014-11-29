@@ -10,7 +10,6 @@ import time
 import logging
 import signal
 from home_automation import receiver
-from home_automation import gardening
 
 LOGGING_FORMAT = '%(asctime)s %(name)-8s %(levelname)-8s: %(message)s'
 DATE_FORMAT = '%Y/%m/%d %H:%M:%S'
@@ -76,20 +75,15 @@ def main():
 
     logger = logging.getLogger(name=__name__)
 
-    monitors = []
-    monitors.append(gardening.VegetablesPlanterMonitor(arg_parsed.config, log_level=log_level))
-    #monitors.append(powerplant.SolarPowerMonitor(arg_parsed.config, log_level=log_level))
-
-    logger.info('monitor process objects have been generated.')
-
     receivers = []
-    receivers.append(receiver.RPiUartReceiver(monitors, arg_parsed.config, log_level=log_level))
-    #receivers.append(receiver.UsbSerReceiver(monitors, arg_parsed.config, log_level=log_level))
+    receivers.append(receiver.RPiUartReceiver(arg_parsed.config, log_level=log_level))
+    #receivers.append(receiver.UsbSerReceiver(arg_parsed.config, log_level=log_level))
 
     logger.info('receiver proces objects have been generated.')
 
     for obj in receivers:
         obj.start()
+        obj.start_monitors()
 
     logger.info('all receiver process has started.')
 
@@ -99,9 +93,8 @@ def main():
         time.sleep(3)
 
     for obj in receivers:
-        logger.debug('terminating {0}'.format(obj))
         obj.post_terminate()
-        logger.debug('joining {0}'.format(obj))
+        logger.debug('terminating {0}'.format(obj))
         obj.join(30)
         logger.info('joined {0}'.format(obj))
 
