@@ -39,10 +39,9 @@ Another function does not work yet.
     2. Run the blew commands.
 
             $ git clone https://github.com/dodo5522/home-automation
-            $ cd ./home-automation/server
-            $ python3 ./setup.py build
-            $ sudo python3 ./setup.py install
-            $ nohup python3 -m home_automation &
+            $ cd ./home-automation
+            $ ./setup.sh
+            $ sudo /etc/init.d/home-automation start
 
 2. Arduino with XBee router
     1. Use Arduino IDE 1.5.8 or later.
