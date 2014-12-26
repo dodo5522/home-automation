@@ -32,26 +32,10 @@ class MyUnitTest(unittest.TestCase):
         wait_time = 4
 
         class TestChildProcess1(BaseProcess):
-            def post_terminate(self):
-                self._message_queue.put_nowait((BaseProcess.QUEUE_ID_TERMINATE, wait_time))
-                logging.debug('{0}: sleep 10 terminate message is posted.'.format(self.name))
-
-            def _do_terminate(self, wait):
-                for i in range(0, wait):
-                    logging.debug('{0}: terminating.'.format(self.name))
-                    time.sleep(1)
-                logging.debug('{0}: terminated.'.format(self.name))
+            pass
 
         class TestChildProcess2(BaseProcess):
-            def post_terminate(self):
-                self._message_queue.put_nowait((BaseProcess.QUEUE_ID_TERMINATE, int(wait_time/2)))
-                logging.debug('{0}: sleep 5 terminate message is posted.'.format(self.name))
-
-            def _do_terminate(self, wait):
-                for i in range(0, wait):
-                    logging.debug('{0}: terminating.'.format(self.name))
-                    time.sleep(1)
-                logging.debug('{0}: terminated.'.format(self.name))
+            pass
 
         p = []
         p.append(TestChildProcess1(log_level=logging.DEBUG))
@@ -68,7 +52,7 @@ class MyUnitTest(unittest.TestCase):
             process.post_terminate()
 
         for process in p:
-            process.join()
+            process.join(1)
 
         end_time = datetime.datetime.today()
         logging.debug(end_time)
@@ -77,15 +61,12 @@ class MyUnitTest(unittest.TestCase):
         diff_seconds += (end_time - start_time).microseconds / 1000000.0
         logging.info('diff: {0} [s]'.format(diff_seconds))
 
-        #TODO: not perfect test pattern...
-        self.assertTrue(diff_seconds >= wait_time)
-        self.assertTrue(diff_seconds < wait_time + 1)
-
         for process in p:
             self.assertFalse(process.is_alive())
 
+    @unittest.skip("not yet implemented")
     def test_ReceiverProcess(self):
-        pass
+        raise NotImplementedError
 
     def test_Configuration(self):
         config_test = []
