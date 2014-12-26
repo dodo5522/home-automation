@@ -30,27 +30,33 @@ class Configuration(object):
                     value = self._config_data[section][option]
                     self._logger.debug('{0}:{1}={2}'.format(section, option, value))
 
-    def read_config(self, option, value_type=str, int_base=10):
-        '''
-        read_config: option string -> value
+    def read_config(self, key, value_type=str, int_base=10):
+        ''' Read the configuration with the specified key.
+            This function returns the value with the specified data type.
 
-        Return the value read from configuration file.
-        If no section or option, this method returns None.
+        Args:
+            key (str) : keyword to store the configuration on the file.
+            value_type (type) : data type should be returned.
+            int_base (int) : base to be returned if value_type is int.
+
+        Returns:
+            Data of string or int.
+            If no section or key, this function returns None.
         '''
         section = type(self).__name__.lower()
-        option = option.lower()
+        key = key.lower()
 
-        if option is None:
-            self._logger.debug('option is none.')
+        if key is None:
+            self._logger.debug('key "{0}" is none.'.format(key))
             return None
         if not self._config_data.has_section(section):
-            self._logger.debug('{0} is none.'.format(section))
+            self._logger.debug('section "{0}" is none.'.format(section))
             return None
-        if not self._config_data.has_option(section, option):
-            self._logger.debug('{0} does not have {1}.'.format(section, option))
+        if not self._config_data.has_option(section, key):
+            self._logger.debug('option "{0}" does not have key "{1}".'.format(section, key))
             return None
 
-        value = self._config_data[section][option]
+        value = self._config_data[section][key]
 
         if value_type == int:
             return value_type(value, int_base)
