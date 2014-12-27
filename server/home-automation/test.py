@@ -11,6 +11,14 @@ from home_automation.base.xbeereceiver import ReceiverProcess
 from home_automation.base.config import Configuration
 
 class MyUnitTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        pass
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
     def setUp(self):
         pass
 
@@ -18,8 +26,6 @@ class MyUnitTest(unittest.TestCase):
         pass
 
     def test_BaseProcess(self):
-        wait_time = 4
-
         class TestChildProcess1(BaseProcess):
             pass
 
@@ -36,12 +42,17 @@ class MyUnitTest(unittest.TestCase):
         for process in p:
             process.start()
 
-        # post terminate message to all process
+        for process in p:
+            self.assertTrue(process.is_alive())
+
         for process in p:
             process.post_terminate()
 
         for process in p:
             process.join(1)
+
+        for process in p:
+            self.assertFalse(process.is_alive())
 
         end_time = datetime.datetime.today()
         logging.debug(end_time)
@@ -49,9 +60,6 @@ class MyUnitTest(unittest.TestCase):
         diff_seconds = (end_time - start_time).seconds
         diff_seconds += (end_time - start_time).microseconds / 1000000.0
         logging.info('diff: {0} [s]'.format(diff_seconds))
-
-        for process in p:
-            self.assertFalse(process.is_alive())
 
     @unittest.skip("not yet implemented")
     def test_ReceiverProcess(self):
