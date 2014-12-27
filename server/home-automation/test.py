@@ -38,7 +38,7 @@ class TwitterTest(unittest.TestCase):
     def test_tweet(self):
         self.assertTrue(self.OBJ.tweet("test message."))
 
-class MyUnitTest(unittest.TestCase):
+class BaseProcessTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         pass
@@ -89,9 +89,39 @@ class MyUnitTest(unittest.TestCase):
         diff_seconds += (end_time - start_time).microseconds / 1000000.0
         logging.info('diff: {0} [s]'.format(diff_seconds))
 
+class ReceiverProcessTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        pass
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
     @unittest.skip("not yet implemented")
     def test_ReceiverProcess(self):
         raise NotImplementedError
+
+class ConfigurationTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        pass
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
 
     def test_Configuration(self):
         config_test = []
