@@ -35,6 +35,7 @@ class TwitterTest(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @unittest.skip("cannot test this yet.")
     def test_tweet(self):
         self.assertTrue(self.OBJ.tweet("test message."))
 
