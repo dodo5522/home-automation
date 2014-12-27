@@ -9,8 +9,36 @@ import datetime,time
 from home_automation.base.process import BaseProcess
 from home_automation.base.xbeereceiver import ReceiverProcess
 from home_automation.base.config import Configuration
+from home_automation.base.tweet import Twitter
 
-class MyUnitTest(unittest.TestCase):
+class TwitterTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.CONSUMER_KEY = ""
+        cls.CONSUMER_SEC = ""
+        cls.ACCESS_TOK = ""
+        cls.ACCESS_SEC = ""
+
+        cls.OBJ = Twitter(\
+                cls.CONSUMER_KEY, \
+                cls.CONSUMER_SEC, \
+                cls.ACCESS_TOK, \
+                cls.ACCESS_SEC)
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_tweet(self):
+        self.assertTrue(self.OBJ.tweet("test message."))
+
+class BaseProcessTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         pass
@@ -61,9 +89,39 @@ class MyUnitTest(unittest.TestCase):
         diff_seconds += (end_time - start_time).microseconds / 1000000.0
         logging.info('diff: {0} [s]'.format(diff_seconds))
 
+class ReceiverProcessTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        pass
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
     @unittest.skip("not yet implemented")
     def test_ReceiverProcess(self):
         raise NotImplementedError
+
+class ConfigurationTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        pass
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
 
     def test_Configuration(self):
         config_test = []
