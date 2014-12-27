@@ -40,13 +40,3 @@ class Twitter(object):
 
         return True if req.status_code == 200 else False
 
-if __name__ == "__main__":
-    import sys
-    my_twitter = Twitter(\
-            "", \
-            "", \
-            "", \
-            "")
-
-    my_twitter.tweet(sys.argv[1])
-

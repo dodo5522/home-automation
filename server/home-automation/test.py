@@ -9,6 +9,34 @@ import datetime,time
 from home_automation.base.process import BaseProcess
 from home_automation.base.xbeereceiver import ReceiverProcess
 from home_automation.base.config import Configuration
+from home_automation.base.tweet import Twitter
+
+class TwitterTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.CONSUMER_KEY = ""
+        cls.CONSUMER_SEC = ""
+        cls.ACCESS_TOK = ""
+        cls.ACCESS_SEC = ""
+
+        cls.OBJ = Twitter(\
+                cls.CONSUMER_KEY, \
+                cls.CONSUMER_SEC, \
+                cls.ACCESS_TOK, \
+                cls.ACCESS_SEC)
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_tweet(self):
+        self.assertTrue(self.OBJ.tweet("test message."))
 
 class MyUnitTest(unittest.TestCase):
     @classmethod
