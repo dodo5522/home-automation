@@ -6,24 +6,43 @@ import os
 import unittest
 import logging
 import datetime,time
+import configparser
 from home_automation.base.process import BaseProcess
 from home_automation.base.xbeereceiver import ReceiverProcess
 from home_automation.base.config import Configuration
 from home_automation.base.tweet import Twitter
 
 class TwitterTest(unittest.TestCase):
+    _PATH_CONF = "/etc/home_automation/setting.conf"
+
     @classmethod
     def setUpClass(cls):
-        cls.CONSUMER_KEY = ""
-        cls.CONSUMER_SEC = ""
-        cls.ACCESS_TOK = ""
-        cls.ACCESS_SEC = ""
+        cls._CONSUMER_KEY = ""
+        cls._CONSUMER_SEC = ""
+        cls._ACCESS_TOK = ""
+        cls._ACCESS_SEC = ""
+        cls._OBJ = None
 
-        cls.OBJ = Twitter(\
-                cls.CONSUMER_KEY, \
-                cls.CONSUMER_SEC, \
-                cls.ACCESS_TOK, \
-                cls.ACCESS_SEC)
+        if os.path.isfile(cls._PATH_CONF):
+            _config_data = configparser.ConfigParser()
+            _config_data.read(cls._PATH_CONF)
+        else:
+            return
+
+        cls._CONSUMER_KEY = \
+                _config_data["vegetablesplantermonitor"]["twitter_consumer_key"]
+        cls._CONSUMER_SEC = \
+                _config_data["vegetablesplantermonitor"]["twitter_consumer_sec"]
+        cls._ACCESS_TOK = \
+                _config_data["vegetablesplantermonitor"]["twitter_access_tok"]
+        cls._ACCESS_SEC = \
+                _config_data["vegetablesplantermonitor"]["twitter_access_sec"]
+
+        cls._OBJ = Twitter(\
+                cls._CONSUMER_KEY, \
+                cls._CONSUMER_SEC, \
+                cls._ACCESS_TOK, \
+                cls._ACCESS_SEC)
 
     @classmethod
     def tearDownClass(cls):
@@ -35,9 +54,9 @@ class TwitterTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    @unittest.skip("cannot test this yet.")
     def test_tweet(self):
-        self.assertTrue(self.OBJ.tweet("test message."))
+        if self._OBJ is not None:
+            self.assertTrue(self._OBJ.tweet("test message."))
 
 class BaseProcessTest(unittest.TestCase):
     @classmethod
