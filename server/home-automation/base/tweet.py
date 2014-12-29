@@ -37,6 +37,5 @@ class Twitter(object):
         """
         params = {"status":message}
         req = self._twitter.post(self._url_api, params=params)
-
         return True if req.status_code == 200 else False
 
