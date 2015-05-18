@@ -1,7 +1,7 @@
-ARDUINO_DIR      = /Applications/Arduino.app/Contents/Resources/Java
+ARDUINO_DIR      = /Applications/Arduino.app/Contents/Java
 ARDMK_DIR        = ../make_env
 AVR_TOOLS_DIR    = $(ARDUINO_DIR)/hardware/tools/avr
-MONITOR_PORT     = /dev/cu.usb*
+MONITOR_PORT     = /dev/cu.usbserial*
 MONITOR_BAUDRATE = 9600
 BOARD_TAG        = pro
 MCU              = atmega328p
