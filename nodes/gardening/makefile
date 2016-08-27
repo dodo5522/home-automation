@@ -13,6 +13,7 @@ CPPFLAGS        += -fno-threadsafe-statics
 ifneq ($(DEBUG),)
 CPPFLAGS        += -DENABLE_DEBUG_$(DEBUG)_SERIAL
 endif
+USER_LIB_PATH   := $(realpath ../libraries)
 
 AVRDUDE_ARD_BAUDRATE = 57600
 AVRDUDE_CONF = $(ARDUINO_DIR)/hardware/tools/avr/etc/avrdude.conf
